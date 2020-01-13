@@ -1,13 +1,33 @@
+
 # What is this ?
-a form generator in reacts
-use your time for more useful things
+JSON React Form is library that convert JSON schema into React component forms.
+
+## Supported form's types
+- text
+- number
+- date
+- select
+
 
 ## How To Use
+Install this library using `npm i json-reactform` or `yarn add json-reactform`.
 
-Install this library using
-`npm i jsontoForm`
+### JSON Schema
+Then define JSON schema with format:
+```
+[name_label] : {
+    options
+}
+```
 
-make your schema
+#### Options
+- **type**: text | number | date | select
+- **required**: true | false
+- **options**: array of object of value and label
+- **query**: use request to get options, return it same as ***options*** (value and label)
+
+
+## Example
 ```
 export default {
   "Plan Date": {
@@ -25,7 +45,8 @@ export default {
   },
   "Item Number": {
     "type": "select",
-    "options": [    //use static json arry to get options
+    "required": true
+    "options": [ //use static json arry to get options
       {
         "value": "1",
         "label": "item 1"
@@ -35,45 +56,52 @@ export default {
         "label": "item 2"
       }
     ],
-    "required": true
   },
 }
+```
+
+Don't forget to include css bootstrap into your project.
+```
+import 'bootstrap/dist/css/bootstrap.min.css';
+```
+
+Within the component you want to add the form, import `JsonToForm` from library and your schema, make your submit function inside your component.
 
 ```
-Import `jsontoForm` from library and your schema for form,
-make your submit function inside your component,
-then return it as component
+import {JsonToForm} from 'json-reactform';
+import model from '../your/schema';
 
-```
-import jsontoForm from 'react-jsontoform';
-import model from '../schema/stock';
+const YourComponent = () => {
+  // Do anything within submit function.
+  const submit = (params) => {
+    console.log(params);
+  }
 
-const FormStock = () => {
-	const submit = (params) => {
-		return postStock(params);
-	}
-	return (
-		<Container>
-			<JsonToForm model={model} onSubmit={submit}/>
-		</Container>
-	)
+  return (
+    <div>
+      <JsonToForm model={model} onSubmit={submit}/>
+    </div>
+  )
 }
 ```
 
-
+## peerDependecies
+Make sure you have these libraries installed within your project.
+- axios
+- moment js
 
 ## Contributor
 
-[Aji Agahari](---)  
-[Nasrul](---)  
+- [Aji Agahari](---)
+- [Nasrul](---)
 
 ## Credits
 [reactjs](https://reactjs.org/)
-[reactstrap](https://reactstrap.github.io/)  
-[moment](https://momentjs.com/)  
+[reactstrap](https://reactstrap.github.io/)
+[moment](https://momentjs.com/)
 [axios](https://github.com/axios/axios)
-[react-datepicker](https://github.com/Hacker0x01/react-datepicker)  
+[react-datepicker](https://github.com/Hacker0x01/react-datepicker)
 [react-select](https://react-select.com/)
+
 ## License
 MIT
-
