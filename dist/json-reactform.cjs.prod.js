@@ -12,7 +12,7 @@ var React = _interopDefault(require("react")), reactstrap = require("reactstrap"
 
 require("react-datepicker/dist/react-datepicker.css");
 
-var moment = _interopDefault(require("moment")), PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), axios = _interopDefault(require("axios")), Select = _interopDefault(require("react-select")), ModalSpinner = function(_ref) {
+var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), axios = _interopDefault(require("axios")), Select = _interopDefault(require("react-select")), ModalSpinner = function(_ref) {
   var _ref$isOpen = _ref.isOpen, isOpen = void 0 !== _ref$isOpen && _ref$isOpen, _ref$message = _ref.message, message = void 0 === _ref$message ? "" : _ref$message, _ref$type = _ref.type, type = void 0 === _ref$type ? "" : _ref$type, _ref$onAccept = _ref.onAccept, onAccept = void 0 === _ref$onAccept ? function() {
     return !1;
   } : _ref$onAccept, _ref$onDismiss = _ref.onDismiss, onDismiss = void 0 === _ref$onDismiss ? function() {
@@ -83,7 +83,7 @@ var CustomDatePicker = React.forwardRef((function(_ref, ref) {
   });
 })), JsonToForm = function(_ref2) {
   var model = _ref2.model, onSubmit = _ref2.onSubmit, cancelSource = axios.CancelToken.source(), cancelToken = cancelSource.token, defaultState = Object.keys(model).reduce((function(a, b) {
-    return a[b] = "date" === model[b].type ? moment().format("YYYY-MM-DD") : "", a;
+    return a[b] = "date" === model[b].type ? (new Date).toISOString() : "", a;
   }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(Object.keys(model).filter((function(obj) {
     return model[obj].query || model[obj].options;
   })).map((function(item) {
@@ -115,11 +115,11 @@ var CustomDatePicker = React.forwardRef((function(_ref, ref) {
     }, React.createElement(DatePicker, {
       id: key,
       name: key,
-      selected: moment(state[key]).toDate(),
+      selected: new Date(state[key]),
       onChange: function(value) {
         return function(key, value) {
           var changedObject = {};
-          changedObject[key] = moment(value).format("YYYY-MM-DD"), setState(_extends({}, state, {}, changedObject));
+          changedObject[key] = value.toISOString(), setState(_extends({}, state, {}, changedObject));
         }(key, value);
       },
       dateFormat: "dd/MM/yyyy",
