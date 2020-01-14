@@ -1,6 +1,6 @@
 {
   "name": "json-reactform",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "generate forms, from json to reactjs",
   "main": "dist/json-reactform.cjs.js",
   "module": "dist/json-reactform.esm.js",
