@@ -10,7 +10,6 @@ import {
 } from 'reactstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from 'moment';
 import ModalSpinner from './components/ModalSpinner';
 import axios from 'axios';
 import Select from 'react-select';
@@ -32,7 +31,7 @@ export const JsonToForm = ({model,onSubmit}) => {
   const cancelSource = axios.CancelToken.source();
   const cancelToken = cancelSource.token;
 	const defaultState = Object.keys(model).reduce((a, b) => {
-		return (a[b] = model[b].type === 'date' ? moment().format('YYYY-MM-DD') : "", a)
+		return (a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a)
 	}, {})
   const [state, setState] = React.useState(defaultState)
 	const [options, setOptions] = React.useState(Object.keys(model)
@@ -129,7 +128,7 @@ export const JsonToForm = ({model,onSubmit}) => {
 
 	const onChangeStateDate = (key, value) => {
 		const changedObject = {}
-		changedObject[key] = moment(value).format('YYYY-MM-DD');
+		changedObject[key] = value.toISOString()
 		setState({
 			...state,
 			...changedObject
@@ -145,7 +144,7 @@ export const JsonToForm = ({model,onSubmit}) => {
 						<DatePicker
 							id={key}
 							name={key}
-							selected={moment(state[key]).toDate()}
+							selected={new Date(state[key])}
 							onChange={value => onChangeStateDate(key, value)}
 							dateFormat="dd/MM/yyyy"
 							customInput={<CustomDatePicker />}

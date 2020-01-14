@@ -8,7 +8,6 @@ var React = _interopDefault(require('react'));
 var reactstrap = require('reactstrap');
 var DatePicker = _interopDefault(require('react-datepicker'));
 require('react-datepicker/dist/react-datepicker.css');
-var moment = _interopDefault(require('moment'));
 var PropTypes = _interopDefault(require('prop-types'));
 var md = require('react-icons/md');
 var axios = _interopDefault(require('axios'));
@@ -97,7 +96,7 @@ var JsonToForm = function JsonToForm(_ref2) {
   var cancelSource = axios.CancelToken.source();
   var cancelToken = cancelSource.token;
   var defaultState = Object.keys(model).reduce(function (a, b) {
-    return a[b] = model[b].type === 'date' ? moment().format('YYYY-MM-DD') : "", a;
+    return a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a;
   }, {});
 
   var _React$useState = React.useState(defaultState),
@@ -218,7 +217,7 @@ var JsonToForm = function JsonToForm(_ref2) {
 
   var onChangeStateDate = function onChangeStateDate(key, value) {
     var changedObject = {};
-    changedObject[key] = moment(value).format('YYYY-MM-DD');
+    changedObject[key] = value.toISOString();
     setState(_extends({}, state, {}, changedObject));
   };
 
@@ -237,7 +236,7 @@ var JsonToForm = function JsonToForm(_ref2) {
       }, React.createElement(DatePicker, {
         id: key,
         name: key,
-        selected: moment(state[key]).toDate(),
+        selected: new Date(state[key]),
         onChange: function onChange(value) {
           return onChangeStateDate(key, value);
         },

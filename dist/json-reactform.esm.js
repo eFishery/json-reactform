@@ -2,7 +2,6 @@ import React from 'react';
 import { Modal, ModalHeader, ModalBody, Spinner, ModalFooter, Button, Input, FormGroup, Label, Col, Form } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import { MdCheckCircle, MdError, MdQuestionAnswer } from 'react-icons/md';
 import axios from 'axios';
@@ -91,7 +90,7 @@ var JsonToForm = function JsonToForm(_ref2) {
   var cancelSource = axios.CancelToken.source();
   var cancelToken = cancelSource.token;
   var defaultState = Object.keys(model).reduce(function (a, b) {
-    return a[b] = model[b].type === 'date' ? moment().format('YYYY-MM-DD') : "", a;
+    return a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a;
   }, {});
 
   var _React$useState = React.useState(defaultState),
@@ -212,7 +211,7 @@ var JsonToForm = function JsonToForm(_ref2) {
 
   var onChangeStateDate = function onChangeStateDate(key, value) {
     var changedObject = {};
-    changedObject[key] = moment(value).format('YYYY-MM-DD');
+    changedObject[key] = value.toISOString();
     setState(_extends({}, state, {}, changedObject));
   };
 
@@ -231,7 +230,7 @@ var JsonToForm = function JsonToForm(_ref2) {
       }, React.createElement(DatePicker, {
         id: key,
         name: key,
-        selected: moment(state[key]).toDate(),
+        selected: new Date(state[key]),
         onChange: function onChange(value) {
           return onChangeStateDate(key, value);
         },
