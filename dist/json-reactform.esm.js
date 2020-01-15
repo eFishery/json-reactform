@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalBody, Spinner, ModalFooter, Button, Input, FormGroup, Label, Col, Form } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, Spinner, ModalFooter, Button, FormGroup, Label, Col, Input, Form } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
@@ -84,9 +84,19 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
     onClick: onClick
   });
 });
-var JsonToForm = function JsonToForm(_ref2) {
+
+function usePrevious(value) {
+  var ref = React.useRef();
+  React.useEffect(function () {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+var index = (function (_ref2) {
   var model = _ref2.model,
-      onSubmit = _ref2.onSubmit;
+      onSubmit = _ref2.onSubmit,
+      onChange = _ref2.onChange;
   var cancelSource = axios.CancelToken.source();
   var cancelToken = cancelSource.token;
   var defaultState = Object.keys(model).reduce(function (a, b) {
@@ -97,27 +107,16 @@ var JsonToForm = function JsonToForm(_ref2) {
       state = _React$useState[0],
       setState = _React$useState[1];
 
-  var _React$useState2 = React.useState(Object.keys(model).filter(function (obj) {
-    return model[obj].query || model[obj].options;
-  }).map(function (item) {
-    return {
-      name: item,
-      query: model[item].query,
-      options: model[item].options,
-      value: []
-    };
-  })),
-      options = _React$useState2[0],
-      setOptions = _React$useState2[1];
+  var prevState = usePrevious(state);
 
-  var _React$useState3 = React.useState({
+  var _React$useState2 = React.useState({
     open: false,
     type: 'loading',
     // success, error
     message: ''
   }),
-      modal = _React$useState3[0],
-      setModal = _React$useState3[1];
+      modal = _React$useState2[0],
+      setModal = _React$useState2[1];
 
   var clearRequest = function clearRequest() {
     cancelSource.cancel('component unmounted');
@@ -156,41 +155,6 @@ var JsonToForm = function JsonToForm(_ref2) {
     });
   };
 
-  var generate = function generate() {
-    var opsi = options;
-    options.forEach(function (item, index) {
-      if (item.query) {
-        axios.get(item.query, {
-          cancelToken: cancelToken
-        }).then(function (data) {
-          opsi[index].value = data.data.reduce(function (arr, item) {
-            if (Object.values(item)[0] && Object.values(item)[0].trim() !== '') {
-              arr = [].concat(arr, [{
-                value: Object.values(item).toString(),
-                label: Object.values(item).toString()
-              }]);
-            }
-
-            return arr;
-          }, [{
-            label: '---',
-            value: ''
-          }]);
-          setOptions([].concat(opsi));
-        })["catch"](function (thrown) {
-          if (axios.isCancel(thrown)) {
-            console.log('Request canceled', thrown.message);
-          }
-        });
-      }
-
-      if (item.options) {
-        opsi[index].value = item.options;
-        setOptions([].concat(opsi));
-      }
-    });
-  };
-
   var onChangeState = function onChangeState(e) {
     var changedObject = {};
     var _e$currentTarget = e.currentTarget,
@@ -205,7 +169,7 @@ var JsonToForm = function JsonToForm(_ref2) {
   var onChangeStateSelect = function onChangeStateSelect(name, selectedOption) {
     var changedObject = {}; // const value = e.currentTarget.value
 
-    changedObject[name] = selectedOption === null ? '' : selectedOption.value;
+    changedObject[name] = selectedOption === null ? '' : selectedOption;
     setState(_extends({}, state, {}, changedObject));
   };
 
@@ -249,29 +213,18 @@ var JsonToForm = function JsonToForm(_ref2) {
         sm: 8,
         className: "d-flex flex-column"
       }, function () {
-        return options.find(function (x) {
-          return x.name === key;
-        }).value.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Select, {
+        return model[key].options.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Select, {
           name: key,
           id: key,
           searchable: true,
           isClearable: true,
           required: model[key].required,
-          defaultValue: options.find(function (x) {
-            return x.name === key;
-          }).value[0] || '',
-          value: options.find(function (x) {
-            return x.name === key;
-          }).value.find(function (y) {
-            return y.value === state[key];
-          }) || '' // option value by state
-          ,
+          defaultValue: model[key].options[0].value || '',
+          value: state[key],
           onChange: function onChange(option) {
             return onChangeStateSelect(key, option);
           },
-          options: options.find(function (x) {
-            return x.name === key;
-          }).value
+          options: model[key].options
         }), React.createElement("input", {
           // this field hidden, for detect validation only
           tabIndex: -1,
@@ -309,11 +262,27 @@ var JsonToForm = function JsonToForm(_ref2) {
     }
   });
   React.useEffect(function () {
-    generate();
     return function () {
       clearRequest();
     };
   }, []);
+  React.useEffect(function () {
+    if (onChange) {
+      var changedObject = [];
+
+      if (prevState && Object.keys(prevState).length > 0) {
+        Object.keys(prevState).forEach(function (key) {
+          if (prevState[key] !== state[key]) {
+            changedObject.push(key);
+          }
+        });
+        onChange({
+          value: state,
+          changed: changedObject
+        });
+      }
+    }
+  }, [state]);
   return React.createElement(React.Fragment, null, React.createElement(Form, {
     onSubmit: onFormSubmit
   }, formItems, React.createElement(Button, {
@@ -330,6 +299,6 @@ var JsonToForm = function JsonToForm(_ref2) {
       });
     }
   }));
-};
+});
 
-export { JsonToForm };
+export default index;

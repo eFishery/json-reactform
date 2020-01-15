@@ -25,28 +25,22 @@ const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, o
 		onClick={onClick}
 	/>
 ));
+function usePrevious(value) {
+  const ref = React.useRef();
+  React.useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
 
-
-export const JsonToForm = ({model,onSubmit}) => {
+export default ({model,onSubmit,onChange}) => {
   const cancelSource = axios.CancelToken.source();
   const cancelToken = cancelSource.token;
 	const defaultState = Object.keys(model).reduce((a, b) => {
 		return (a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a)
 	}, {})
-  const [state, setState] = React.useState(defaultState)
-	const [options, setOptions] = React.useState(Object.keys(model)
-		.filter(function (obj) {
-			return model[obj].query || model[obj].options;
-		})
-		.map((item) => {
-			return {
-				name: item,
-        query: model[item].query,
-        options: model[item].options,
-				value: []
-			}
-		})
-  )
+	const [state, setState] = React.useState(defaultState)
+	const prevState = usePrevious(state);
 	const [modal, setModal] = React.useState({
 		open: false,
 		type: 'loading', // success, error
@@ -70,37 +64,8 @@ export const JsonToForm = ({model,onSubmit}) => {
 			setModal(values => ({ ...values, type: 'error', message: 'Failed to Save'}));
 		})
 	}
-	const generate = () => {
-    const opsi = options;
-		options.forEach((item, index) => {
-      if(item.query){
-        axios.get(item.query, { cancelToken })
-          .then((data) => {
-            opsi[index].value = data.data.reduce((arr, item) => {
-              if (Object.values(item)[0] && Object.values(item)[0].trim() !== '') {
-                arr = [...arr, {value: Object.values(item).toString(), label: Object.values(item).toString()}]
-              }
-              return arr;
-            }, [{label: '---', value: ''}])
-            setOptions([
-              ...opsi
-            ])
-          })
-          .catch(function (thrown) {
-            if (axios.isCancel(thrown)) {
-              console.log('Request canceled', thrown.message);
-            }
-          });
-      }
-			if(item.options) {
-        opsi[index].value = item.options;
-        setOptions([
-          ...opsi
-        ])
-      }
-		})
-	}
-
+	
+	
 	const onChangeState = (e) => {
 		const changedObject = {}
 		const {
@@ -119,7 +84,7 @@ export const JsonToForm = ({model,onSubmit}) => {
 	const onChangeStateSelect = (name, selectedOption) => {
 		const changedObject = {}
 		// const value = e.currentTarget.value
-		changedObject[name] = selectedOption === null ? '' : selectedOption.value;
+		changedObject[name] = selectedOption === null ? '' : selectedOption;
 		setState({
 			...state,
 			...changedObject
@@ -160,7 +125,7 @@ export const JsonToForm = ({model,onSubmit}) => {
 					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
 					<Col sm={8} className="d-flex flex-column">
 						{(() => {
-							return options.find(x => x.name === key).value.length > 0 ?
+							return model[key].options.length > 0 ?
 								(
 									<>
 										<Select
@@ -169,10 +134,10 @@ export const JsonToForm = ({model,onSubmit}) => {
 											searchable={true}
 											isClearable={true}
 											required={model[key].required}
-											defaultValue={options.find(x => x.name === key).value[0] || ''}
-											value={options.find(x => x.name === key).value.find(y => y.value === state[key]) || ''} // option value by state
+											defaultValue={model[key].options[0].value || ''}
+											value={state[key]}
 											onChange={option => onChangeStateSelect(key, option)}
-											options={options.find(x => x.name === key).value}
+											options={model[key].options}
 										/>
 										<input // this field hidden, for detect validation only
 											tabIndex={-1}
@@ -206,12 +171,29 @@ export const JsonToForm = ({model,onSubmit}) => {
 	})
 
 	React.useEffect(() => {
-		generate()
 		return () => {
 			clearRequest();
 		};
 	}, [])
 
+	React.useEffect(()=>{
+		if(onChange) {
+			const changedObject = [];
+			if(prevState && Object.keys(prevState).length>0){
+				Object.keys(prevState).forEach((key) => {
+					if(prevState[key]!==state[key]){
+						changedObject.push(key);
+					}
+				})
+				onChange({
+					value: state,
+					changed: changedObject
+				});
+			}
+		}
+	}, [state])
+
+	
 	return (
 		<>
 			<Form onSubmit={onFormSubmit}>
