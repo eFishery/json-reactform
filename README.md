@@ -1,5 +1,9 @@
+[![npm](https://img.shields.io/npm/v/json-reactform)](https://www.npmjs.com/package/json-reactform)
+![npm bundle size](https://img.shields.io/bundlephobia/min/json-reactform)
+![GitHub contributors](https://img.shields.io/github/contributors/efishery/json-reactform)
+![NPM](https://img.shields.io/npm/l/json-reactform)
 
-# What is this ?
+# JSON-ReactForm
 JSON React Form is library that convert JSON schema into React component forms.
 
 ## Supported form's types
@@ -15,7 +19,7 @@ Install this library using `npm i json-reactform` or `yarn add json-reactform`.
 ### JSON Schema
 Then define JSON schema with format:
 ```
-[name_label] : {
+[label_name] : {
     options
 }
 ```
@@ -86,19 +90,19 @@ const YourComponent = () => {
 ```
 
 ## peerDependecies
-Make sure you have these libraries installed within your project.
+Make sure you have these npm libraries installed within your project.
+- react
 - axios
-- moment js
 
 ## Contributor
 
-- [Aji Agahari](---)
-- [Nasrul](---)
+- [Aji Agahari](https://github.com/ajiagahari)
+- [Nasrul Faizin](https://github.com/nasrul21)
+- [Yuhanas Yulianto](https://github.com/yuhanasy)
 
 ## Credits
 [reactjs](https://reactjs.org/)
 [reactstrap](https://reactstrap.github.io/)
-[moment](https://momentjs.com/)
 [axios](https://github.com/axios/axios)
 [react-datepicker](https://github.com/Hacker0x01/react-datepicker)
 [react-select](https://react-select.com/)

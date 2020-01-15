@@ -1,7 +1,7 @@
 {
   "name": "json-reactform",
   "version": "0.1.2",
-  "description": "generate forms, from json to reactjs",
+  "description": "convert JSON schema into React component forms",
   "main": "dist/json-reactform.cjs.js",
   "module": "dist/json-reactform.esm.js",
   "scripts": {
@@ -21,12 +21,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "not yet"
+    "url": "https://github.com/eFishery/json-reactform"
   },
   "keywords": [
-    "generate",
+    "react",
+    "reactjs",
     "form",
-    "reactjs"
+    "generator",
+    "json",
+    "json-schema"
   ],
   "author": "faizinnasrul21@gmail.com",
   "license": "MIT",
