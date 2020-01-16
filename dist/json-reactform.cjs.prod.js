@@ -12,7 +12,7 @@ var React = _interopDefault(require("react")), reactstrap = require("reactstrap"
 
 require("react-datepicker/dist/react-datepicker.css");
 
-var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), axios = _interopDefault(require("axios")), Select = _interopDefault(require("react-select")), ModalSpinner = function(_ref) {
+var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), Select = _interopDefault(require("react-select")), ModalSpinner = function(_ref) {
   var _ref$isOpen = _ref.isOpen, isOpen = void 0 !== _ref$isOpen && _ref$isOpen, _ref$message = _ref.message, message = void 0 === _ref$message ? "" : _ref$message, _ref$type = _ref.type, type = void 0 === _ref$type ? "" : _ref$type, _ref$onAccept = _ref.onAccept, onAccept = void 0 === _ref$onAccept ? function() {
     return !1;
   } : _ref$onAccept, _ref$onDismiss = _ref.onDismiss, onDismiss = void 0 === _ref$onDismiss ? function() {
@@ -91,10 +91,9 @@ function usePrevious(value) {
 }
 
 var index = function(_ref2) {
-  var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, cancelSource = axios.CancelToken.source(), defaultState = (cancelSource.token, 
-  Object.keys(model).reduce((function(a, b) {
+  var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, defaultState = Object.keys(model).reduce((function(a, b) {
     return a[b] = "date" === model[b].type ? (new Date).toISOString() : "", a;
-  }), {})), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], prevState = usePrevious(state), _React$useState2 = React.useState({
+  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], prevState = usePrevious(state), _React$useState2 = React.useState({
     open: !1,
     type: "loading",
     message: ""

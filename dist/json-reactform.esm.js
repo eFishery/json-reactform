@@ -4,7 +4,6 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
 import { MdCheckCircle, MdError, MdQuestionAnswer } from 'react-icons/md';
-import axios from 'axios';
 import Select from 'react-select';
 
 var ModalSpinner = function ModalSpinner(_ref) {
@@ -97,8 +96,6 @@ var index = (function (_ref2) {
   var model = _ref2.model,
       onSubmit = _ref2.onSubmit,
       onChange = _ref2.onChange;
-  var cancelSource = axios.CancelToken.source();
-  var cancelToken = cancelSource.token;
   var defaultState = Object.keys(model).reduce(function (a, b) {
     return a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a;
   }, {});

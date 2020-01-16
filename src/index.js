@@ -11,7 +11,6 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalSpinner from './components/ModalSpinner';
-import axios from 'axios';
 import Select from 'react-select';
 
 const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name }, ref) => (
@@ -34,8 +33,6 @@ function usePrevious(value) {
 }
 
 export default ({model,onSubmit,onChange}) => {
-  const cancelSource = axios.CancelToken.source();
-  const cancelToken = cancelSource.token;
 	const defaultState = Object.keys(model).reduce((a, b) => {
 		return (a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a)
 	}, {})
