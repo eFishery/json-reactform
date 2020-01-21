@@ -72,7 +72,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 Within the component you want to add the form, import `JsonToForm` from library and your schema, make your submit function inside your component.
 
 ```
-import {JsonToForm} from 'json-reactform';
+import JsonToForm from 'json-reactform';
 import model from '../your/schema';
 
 const YourComponent = () => {
@@ -92,7 +92,6 @@ const YourComponent = () => {
 ## peerDependecies
 Make sure you have these npm libraries installed within your project.
 - react
-- axios
 
 ## Contributor
 
