@@ -12,7 +12,7 @@ var React = _interopDefault(require("react")), reactstrap = require("reactstrap"
 
 require("react-datepicker/dist/react-datepicker.css");
 
-var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), axios = _interopDefault(require("axios")), Select = _interopDefault(require("react-select")), ModalSpinner = function(_ref) {
+var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), Select = _interopDefault(require("react-select")), ModalSpinner = function(_ref) {
   var _ref$isOpen = _ref.isOpen, isOpen = void 0 !== _ref$isOpen && _ref$isOpen, _ref$message = _ref.message, message = void 0 === _ref$message ? "" : _ref$message, _ref$type = _ref.type, type = void 0 === _ref$type ? "" : _ref$type, _ref$onAccept = _ref.onAccept, onAccept = void 0 === _ref$onAccept ? function() {
     return !1;
   } : _ref$onAccept, _ref$onDismiss = _ref.onDismiss, onDismiss = void 0 === _ref$onDismiss ? function() {
@@ -81,23 +81,23 @@ var CustomDatePicker = React.forwardRef((function(_ref, ref) {
     name: name,
     onClick: onClick
   });
-})), JsonToForm = function(_ref2) {
-  var model = _ref2.model, onSubmit = _ref2.onSubmit, cancelSource = axios.CancelToken.source(), cancelToken = cancelSource.token, defaultState = Object.keys(model).reduce((function(a, b) {
+}));
+
+function usePrevious(value) {
+  var ref = React.useRef();
+  return React.useEffect((function() {
+    ref.current = value;
+  })), ref.current;
+}
+
+var index = function(_ref2) {
+  var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, defaultState = Object.keys(model).reduce((function(a, b) {
     return a[b] = "date" === model[b].type ? (new Date).toISOString() : "", a;
-  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(Object.keys(model).filter((function(obj) {
-    return model[obj].query || model[obj].options;
-  })).map((function(item) {
-    return {
-      name: item,
-      query: model[item].query,
-      options: model[item].options,
-      value: []
-    };
-  }))), options = _React$useState2[0], setOptions = _React$useState2[1], _React$useState3 = React.useState({
+  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], prevState = usePrevious(state), _React$useState2 = React.useState({
     open: !1,
     type: "loading",
     message: ""
-  }), modal = _React$useState3[0], setModal = _React$useState3[1], formItems = [], onChangeState = function(e) {
+  }), modal = _React$useState2[0], setModal = _React$useState2[1], formItems = [], onChangeState = function(e) {
     var changedObject = {}, _e$currentTarget = e.currentTarget, value = _e$currentTarget.value;
     changedObject[_e$currentTarget.name] = value, setState(_extends({}, state, {}, changedObject));
   };
@@ -134,30 +134,20 @@ var CustomDatePicker = React.forwardRef((function(_ref, ref) {
     }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
       sm: 8,
       className: "d-flex flex-column"
-    }, options.find((function(x) {
-      return x.name === key;
-    })).value.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Select, {
+    }, model[key].options.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Select, {
       name: key,
       id: key,
       searchable: !0,
       isClearable: !0,
       required: model[key].required,
-      defaultValue: options.find((function(x) {
-        return x.name === key;
-      })).value[0] || "",
-      value: options.find((function(x) {
-        return x.name === key;
-      })).value.find((function(y) {
-        return y.value === state[key];
-      })) || "",
+      defaultValue: model[key].options[0].value || "",
+      value: state[key],
       onChange: function(option) {
-        return (changedObject = {})[key] = null === (selectedOption = option) ? "" : selectedOption.value, 
+        return (changedObject = {})[key] = null === (selectedOption = option) ? "" : selectedOption, 
         void setState(_extends({}, state, {}, changedObject));
         var selectedOption, changedObject;
       },
-      options: options.find((function(x) {
-        return x.name === key;
-      })).value
+      options: model[key].options
     }), React.createElement("input", {
       tabIndex: -1,
       autoComplete: "off",
@@ -189,27 +179,20 @@ var CustomDatePicker = React.forwardRef((function(_ref, ref) {
       required: model[key].required
     }))));
   })), React.useEffect((function() {
-    var opsi;
-    return opsi = options, options.forEach((function(item, index) {
-      item.query && axios.get(item.query, {
-        cancelToken: cancelToken
-      }).then((function(data) {
-        opsi[index].value = data.data.reduce((function(arr, item) {
-          return Object.values(item)[0] && "" !== Object.values(item)[0].trim() && (arr = [].concat(arr, [ {
-            value: Object.values(item).toString(),
-            label: Object.values(item).toString()
-          } ])), arr;
-        }), [ {
-          label: "---",
-          value: ""
-        } ]), setOptions([].concat(opsi));
-      })).catch((function(thrown) {
-        axios.isCancel(thrown) && console.log("Request canceled", thrown.message);
-      })), item.options && (opsi[index].value = item.options, setOptions([].concat(opsi)));
-    })), function() {
+    return function() {
       cancelSource.cancel("component unmounted");
     };
-  }), []), React.createElement(React.Fragment, null, React.createElement(reactstrap.Form, {
+  }), []), React.useEffect((function() {
+    if (onChange) {
+      var changedObject = [];
+      prevState && Object.keys(prevState).length > 0 && (Object.keys(prevState).forEach((function(key) {
+        prevState[key] !== state[key] && changedObject.push(key);
+      })), onChange({
+        value: state,
+        changed: changedObject
+      }));
+    }
+  }), [ state ]), React.createElement(React.Fragment, null, React.createElement(reactstrap.Form, {
     onSubmit: function(e) {
       e.preventDefault(), setModal((function(values) {
         return _extends({}, values, {
@@ -253,4 +236,4 @@ var CustomDatePicker = React.forwardRef((function(_ref, ref) {
   }));
 };
 
-exports.JsonToForm = JsonToForm;
+exports.default = index;
