@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalBody, Spinner, ModalFooter, Button, FormGroup, Label, Col, CustomInput, Input, Form } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, Spinner, ModalFooter, Button, FormGroup, Label, Col, CustomInput, Row, Input, Form } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
@@ -296,6 +296,19 @@ var index = (function (_ref2) {
           onChange: onChangeState
         });
       }))));
+    } else if (model[key].type === 'submit') {
+      formItems.push(React.createElement(Row, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(Col, {
+        sm: 4
+      }), React.createElement(Col, {
+        sm: 8
+      }, React.createElement(Button, {
+        type: model[key].type,
+        color: "success"
+      }, key))));
     } else {
       formItems.push(React.createElement(FormGroup, {
         key: key,
@@ -341,9 +354,7 @@ var index = (function (_ref2) {
   }, [state]);
   return React.createElement(React.Fragment, null, React.createElement(Form, {
     onSubmit: onFormSubmit
-  }, formItems, React.createElement(Button, {
-    color: "success"
-  }, "Submit")), React.createElement(ModalSpinner, {
+  }, formItems), React.createElement(ModalSpinner, {
     isOpen: modal.open,
     type: modal.type,
     message: modal.message,

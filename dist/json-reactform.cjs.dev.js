@@ -302,6 +302,19 @@ var index = (function (_ref2) {
           onChange: onChangeState
         });
       }))));
+    } else if (model[key].type === 'submit') {
+      formItems.push(React.createElement(reactstrap.Row, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(reactstrap.Col, {
+        sm: 4
+      }), React.createElement(reactstrap.Col, {
+        sm: 8
+      }, React.createElement(reactstrap.Button, {
+        type: model[key].type,
+        color: "success"
+      }, key))));
     } else {
       formItems.push(React.createElement(reactstrap.FormGroup, {
         key: key,
@@ -347,9 +360,7 @@ var index = (function (_ref2) {
   }, [state]);
   return React.createElement(React.Fragment, null, React.createElement(reactstrap.Form, {
     onSubmit: onFormSubmit
-  }, formItems, React.createElement(reactstrap.Button, {
-    color: "success"
-  }, "Submit")), React.createElement(ModalSpinner, {
+  }, formItems), React.createElement(ModalSpinner, {
     isOpen: modal.open,
     type: modal.type,
     message: modal.message,

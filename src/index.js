@@ -7,7 +7,8 @@ import {
 	Input,
 	Col,
 	Spinner,
-	CustomInput
+	CustomInput,
+	Row
 } from 'reactstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -213,6 +214,16 @@ export default ({model,onSubmit,onChange}) => {
 				</FormGroup>
 			)
 		}
+		else if (model[key].type === 'submit') {
+			formItems.push(
+				<Row key={key} row className="mb-4">
+					<Col sm={4}></Col>
+					<Col sm={8}>
+						<Button type={model[key].type} color="success">{key}</Button>
+					</Col>
+				</Row>
+			)
+		}
 		else {
 			formItems.push(
 				<FormGroup key={key} row className="mb-4">
@@ -254,7 +265,6 @@ export default ({model,onSubmit,onChange}) => {
 		<>
 			<Form onSubmit={onFormSubmit}>
 				{formItems}
-				<Button color="success">Submit</Button>
 			</Form>
 			<ModalSpinner
 				isOpen={modal.open}

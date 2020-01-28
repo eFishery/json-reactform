@@ -212,7 +212,18 @@ var index = function(_ref2) {
         required: model[key].required,
         onChange: onChangeState
       });
-    }))))) : formItems.push(React.createElement(reactstrap.FormGroup, {
+    }))))) : "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
+      key: key,
+      row: !0,
+      className: "mb-4"
+    }, React.createElement(reactstrap.Col, {
+      sm: 4
+    }), React.createElement(reactstrap.Col, {
+      sm: 8
+    }, React.createElement(reactstrap.Button, {
+      type: model[key].type,
+      color: "success"
+    }, key)))) : formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"
@@ -272,9 +283,7 @@ var index = function(_ref2) {
         }));
       }));
     }
-  }, formItems, React.createElement(reactstrap.Button, {
-    color: "success"
-  }, "Submit")), React.createElement(ModalSpinner, {
+  }, formItems), React.createElement(ModalSpinner, {
     isOpen: modal.open,
     type: modal.type,
     message: modal.message,
