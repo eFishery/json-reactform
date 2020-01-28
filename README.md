@@ -12,6 +12,9 @@ JSON React Form is library that convert JSON schema into React component forms.
 - date
 - select
 - textarea
+- checkbox
+- radio
+- submit button
 
 ## How To Use
 Install this library using `npm i json-reactform` or `yarn add json-reactform`.
@@ -56,6 +59,37 @@ export default {
       }
     ],
   },
+  "Parts": {
+    "type": "checkbox",
+    "required": true
+    "options": [ //use static json arry to get options
+      {
+        "value": "checkbox_item_1",
+        "label": "Checkbox 1"
+      },
+      {
+        "value": "checkbox_item_2",
+        "label": "Checkbox 2"
+      }
+    ],
+  },
+  "Status": {
+    "type": "radio",
+    "required": true,
+    "options": [ //use static json arry to get options
+      {
+        "value": "completed",
+        "label": "Completed"
+      },
+      {
+        "value": "not_completed",
+        "label": "Not Completed"
+      }
+    ],
+  },
+  "Save": { // button submit
+    "type": "submit",
+  }
 }
 ```
 
