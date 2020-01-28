@@ -6,7 +6,8 @@ import {
 	Label,
 	Input,
 	Col,
-	Spinner
+	Spinner,
+	CustomInput
 } from 'reactstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -34,7 +35,9 @@ function usePrevious(value) {
 
 export default ({model,onSubmit,onChange}) => {
 	const defaultState = Object.keys(model).reduce((a, b) => {
-		return (a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a)
+		return (a[b] = model[b].type === 'date' ? 
+			new Date().toISOString() : (model[b].type === 'checkbox' ? [] : "")
+			, a)
 	}, {})
 	const [state, setState] = React.useState(defaultState)
 	const prevState = usePrevious(state);
@@ -82,6 +85,16 @@ export default ({model,onSubmit,onChange}) => {
 		const changedObject = {}
 		// const value = e.currentTarget.value
 		changedObject[name] = selectedOption === null ? '' : selectedOption;
+		setState({
+			...state,
+			...changedObject
+		})
+	}
+
+	// onchange checkbox
+	const onChangeStateCheckbox = (key, value) => {
+		const changedObject = {}
+		changedObject[key] = state[key].includes(value) ? state[key].filter(item => item != value) : [...state[key], value]
 		setState({
 			...state,
 			...changedObject
@@ -150,6 +163,20 @@ export default ({model,onSubmit,onChange}) => {
 								)
 						})()}
 
+					</Col>
+				</FormGroup>
+			)
+		}
+		else if (model[key].type === 'checkbox') {
+			formItems.push(
+				<FormGroup key={key} row className="mb-4">
+					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
+					<Col sm={8} className="d-flex flex-column">
+					{
+						model[key].options.map(item => {
+							return <CustomInput type="checkbox" label={item.label} id={item.value} key={item.value} name={key} value={item.value} checked={state[key].includes(item.value)} onChange={(e) => onChangeStateCheckbox(key, e.target.value)} />
+						})
+					}
 					</Col>
 				</FormGroup>
 			)

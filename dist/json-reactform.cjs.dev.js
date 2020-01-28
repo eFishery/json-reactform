@@ -103,7 +103,7 @@ var index = (function (_ref2) {
       onSubmit = _ref2.onSubmit,
       onChange = _ref2.onChange;
   var defaultState = Object.keys(model).reduce(function (a, b) {
-    return a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a;
+    return a[b] = model[b].type === 'date' ? new Date().toISOString() : model[b].type === 'checkbox' ? [] : "", a;
   }, {});
 
   var _React$useState = React.useState(defaultState),
@@ -174,6 +174,15 @@ var index = (function (_ref2) {
 
     changedObject[name] = selectedOption === null ? '' : selectedOption;
     setState(_extends({}, state, {}, changedObject));
+  }; // onchange checkbox
+
+
+  var onChangeStateCheckbox = function onChangeStateCheckbox(key, value) {
+    var changedObject = {};
+    changedObject[key] = state[key].includes(value) ? state[key].filter(function (item) {
+      return item != value;
+    }) : [].concat(state[key], [value]);
+    setState(_extends({}, state, {}, changedObject));
   };
 
   var onChangeStateDate = function onChangeStateDate(key, value) {
@@ -243,6 +252,31 @@ var index = (function (_ref2) {
           }
         })) : React.createElement(reactstrap.Spinner, null);
       }())));
+    } else if (model[key].type === 'checkbox') {
+      formItems.push(React.createElement(reactstrap.FormGroup, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(reactstrap.Label, {
+        "for": key,
+        sm: 4
+      }, key, " ", model[key].required ? '*' : null), React.createElement(reactstrap.Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, "TEST ", JSON.stringify(model[key].options), model[key].options.map(function (item) {
+        return React.createElement(reactstrap.CustomInput, {
+          type: "checkbox",
+          label: item.label,
+          id: item.value,
+          key: item.value,
+          name: key,
+          value: item.value,
+          checked: state[key].includes(item.value),
+          onChange: function onChange(e) {
+            return onChangeStateCheckbox(key, e.target.value);
+          }
+        });
+      }))));
     } else {
       formItems.push(React.createElement(reactstrap.FormGroup, {
         key: key,
