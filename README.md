@@ -11,7 +11,7 @@ JSON React Form is library that convert JSON schema into React component forms.
 - number
 - date
 - select
-
+- textarea
 
 ## How To Use
 Install this library using `npm i json-reactform` or `yarn add json-reactform`.
