@@ -190,6 +190,29 @@ export default ({model,onSubmit,onChange}) => {
 				</FormGroup>
 			)
 		}
+		else if (model[key].type === 'radio') {
+			formItems.push(
+				<FormGroup key={key} row className="mb-4">
+					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
+					<Col sm={8} className="d-flex flex-column">
+					{
+						model[key].options.map((item, index) => {
+							return <CustomInput 
+								type="radio"
+								label={item.label}
+								id={item.value}
+								key={item.value}
+								name={key}
+								value={item.value}
+								checked={state[key].includes(item.value)} 
+								required={model[key].required}
+								onChange={onChangeState} />
+						})
+					}
+					</Col>
+				</FormGroup>
+			)
+		}
 		else {
 			formItems.push(
 				<FormGroup key={key} row className="mb-4">

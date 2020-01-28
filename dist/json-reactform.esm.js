@@ -272,6 +272,30 @@ var index = (function (_ref2) {
           }
         });
       }))));
+    } else if (model[key].type === 'radio') {
+      formItems.push(React.createElement(FormGroup, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(Label, {
+        "for": key,
+        sm: 4
+      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, model[key].options.map(function (item, index) {
+        return React.createElement(CustomInput, {
+          type: "radio",
+          label: item.label,
+          id: item.value,
+          key: item.value,
+          name: key,
+          value: item.value,
+          checked: state[key].includes(item.value),
+          required: model[key].required,
+          onChange: onChangeState
+        });
+      }))));
     } else {
       formItems.push(React.createElement(FormGroup, {
         key: key,
