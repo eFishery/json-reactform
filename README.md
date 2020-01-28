@@ -38,11 +38,6 @@ export default {
     "type": "date",
     "required": true
   },
-  "Item Code & Name": {
-    "type": "select",
-    "query": "[your API]", //use request to get options, return it same as 'options' (value and label)
-    "required": true
-  },
   "Qty": {
     "type": "number",
     "required": true
