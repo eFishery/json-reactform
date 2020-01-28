@@ -171,7 +171,7 @@ var index = function(_ref2) {
     }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
       sm: 8,
       className: "d-flex flex-column"
-    }, "TEST ", JSON.stringify(model[key].options), model[key].options.map((function(item) {
+    }, model[key].options.map((function(item, index) {
       return React.createElement(reactstrap.CustomInput, {
         type: "checkbox",
         label: item.label,
@@ -180,6 +180,7 @@ var index = function(_ref2) {
         name: key,
         value: item.value,
         checked: state[key].includes(item.value),
+        required: 0 === index && 0 === state[key].length && model[key].required,
         onChange: function(e) {
           return function(key, value) {
             var changedObject = {};

@@ -173,8 +173,17 @@ export default ({model,onSubmit,onChange}) => {
 					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
 					<Col sm={8} className="d-flex flex-column">
 					{
-						model[key].options.map(item => {
-							return <CustomInput type="checkbox" label={item.label} id={item.value} key={item.value} name={key} value={item.value} checked={state[key].includes(item.value)} onChange={(e) => onChangeStateCheckbox(key, e.target.value)} />
+						model[key].options.map((item, index) => {
+							return <CustomInput 
+								type="checkbox"
+								label={item.label}
+								id={item.value}
+								key={item.value}
+								name={key}
+								value={item.value}
+								checked={state[key].includes(item.value)} 
+								required={index === 0 && state[key].length === 0 && model[key].required}
+								onChange={(e) => onChangeStateCheckbox(key, e.target.value)} />
 						})
 					}
 					</Col>
