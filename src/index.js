@@ -6,7 +6,9 @@ import {
 	Label,
 	Input,
 	Col,
-	Spinner
+	Spinner,
+	CustomInput,
+	Row
 } from 'reactstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -34,7 +36,9 @@ function usePrevious(value) {
 
 export default ({model,onSubmit,onChange}) => {
 	const defaultState = Object.keys(model).reduce((a, b) => {
-		return (a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a)
+		return (a[b] = model[b].type === 'date' ? 
+			new Date().toISOString() : (model[b].type === 'checkbox' ? [] : "")
+			, a)
 	}, {})
 	const [state, setState] = React.useState(defaultState)
 	const prevState = usePrevious(state);
@@ -82,6 +86,16 @@ export default ({model,onSubmit,onChange}) => {
 		const changedObject = {}
 		// const value = e.currentTarget.value
 		changedObject[name] = selectedOption === null ? '' : selectedOption;
+		setState({
+			...state,
+			...changedObject
+		})
+	}
+
+	// onchange checkbox
+	const onChangeStateCheckbox = (key, value) => {
+		const changedObject = {}
+		changedObject[key] = state[key].includes(value) ? state[key].filter(item => item != value) : [...state[key], value]
 		setState({
 			...state,
 			...changedObject
@@ -154,6 +168,62 @@ export default ({model,onSubmit,onChange}) => {
 				</FormGroup>
 			)
 		}
+		else if (model[key].type === 'checkbox') {
+			formItems.push(
+				<FormGroup key={key} row className="mb-4">
+					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
+					<Col sm={8} className="d-flex flex-column">
+					{
+						model[key].options.map((item, index) => {
+							return <CustomInput 
+								type="checkbox"
+								label={item.label}
+								id={item.value}
+								key={item.value}
+								name={key}
+								value={item.value}
+								checked={state[key].includes(item.value)} 
+								required={index === 0 && state[key].length === 0 && model[key].required}
+								onChange={(e) => onChangeStateCheckbox(key, e.target.value)} />
+						})
+					}
+					</Col>
+				</FormGroup>
+			)
+		}
+		else if (model[key].type === 'radio') {
+			formItems.push(
+				<FormGroup key={key} row className="mb-4">
+					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
+					<Col sm={8} className="d-flex flex-column">
+					{
+						model[key].options.map((item, index) => {
+							return <CustomInput 
+								type="radio"
+								label={item.label}
+								id={item.value}
+								key={item.value}
+								name={key}
+								value={item.value}
+								checked={state[key].includes(item.value)} 
+								required={model[key].required}
+								onChange={onChangeState} />
+						})
+					}
+					</Col>
+				</FormGroup>
+			)
+		}
+		else if (model[key].type === 'submit') {
+			formItems.push(
+				<Row key={key} row className="mb-4">
+					<Col sm={4}></Col>
+					<Col sm={8}>
+						<Button type={model[key].type} color="success">{key}</Button>
+					</Col>
+				</Row>
+			)
+		}
 		else {
 			formItems.push(
 				<FormGroup key={key} row className="mb-4">
@@ -195,7 +265,6 @@ export default ({model,onSubmit,onChange}) => {
 		<>
 			<Form onSubmit={onFormSubmit}>
 				{formItems}
-				<Button color="success">Submit</Button>
 			</Form>
 			<ModalSpinner
 				isOpen={modal.open}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalBody, Spinner, ModalFooter, Button, FormGroup, Label, Col, Input, Form } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, Spinner, ModalFooter, Button, FormGroup, Label, Col, CustomInput, Row, Input, Form } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
@@ -97,7 +97,7 @@ var index = (function (_ref2) {
       onSubmit = _ref2.onSubmit,
       onChange = _ref2.onChange;
   var defaultState = Object.keys(model).reduce(function (a, b) {
-    return a[b] = model[b].type === 'date' ? new Date().toISOString() : "", a;
+    return a[b] = model[b].type === 'date' ? new Date().toISOString() : model[b].type === 'checkbox' ? [] : "", a;
   }, {});
 
   var _React$useState = React.useState(defaultState),
@@ -168,6 +168,15 @@ var index = (function (_ref2) {
 
     changedObject[name] = selectedOption === null ? '' : selectedOption;
     setState(_extends({}, state, {}, changedObject));
+  }; // onchange checkbox
+
+
+  var onChangeStateCheckbox = function onChangeStateCheckbox(key, value) {
+    var changedObject = {};
+    changedObject[key] = state[key].includes(value) ? state[key].filter(function (item) {
+      return item != value;
+    }) : [].concat(state[key], [value]);
+    setState(_extends({}, state, {}, changedObject));
   };
 
   var onChangeStateDate = function onChangeStateDate(key, value) {
@@ -237,6 +246,69 @@ var index = (function (_ref2) {
           }
         })) : React.createElement(Spinner, null);
       }())));
+    } else if (model[key].type === 'checkbox') {
+      formItems.push(React.createElement(FormGroup, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(Label, {
+        "for": key,
+        sm: 4
+      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, model[key].options.map(function (item, index) {
+        return React.createElement(CustomInput, {
+          type: "checkbox",
+          label: item.label,
+          id: item.value,
+          key: item.value,
+          name: key,
+          value: item.value,
+          checked: state[key].includes(item.value),
+          required: index === 0 && state[key].length === 0 && model[key].required,
+          onChange: function onChange(e) {
+            return onChangeStateCheckbox(key, e.target.value);
+          }
+        });
+      }))));
+    } else if (model[key].type === 'radio') {
+      formItems.push(React.createElement(FormGroup, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(Label, {
+        "for": key,
+        sm: 4
+      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, model[key].options.map(function (item, index) {
+        return React.createElement(CustomInput, {
+          type: "radio",
+          label: item.label,
+          id: item.value,
+          key: item.value,
+          name: key,
+          value: item.value,
+          checked: state[key].includes(item.value),
+          required: model[key].required,
+          onChange: onChangeState
+        });
+      }))));
+    } else if (model[key].type === 'submit') {
+      formItems.push(React.createElement(Row, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(Col, {
+        sm: 4
+      }), React.createElement(Col, {
+        sm: 8
+      }, React.createElement(Button, {
+        type: model[key].type,
+        color: "success"
+      }, key))));
     } else {
       formItems.push(React.createElement(FormGroup, {
         key: key,
@@ -282,9 +354,7 @@ var index = (function (_ref2) {
   }, [state]);
   return React.createElement(React.Fragment, null, React.createElement(Form, {
     onSubmit: onFormSubmit
-  }, formItems, React.createElement(Button, {
-    color: "success"
-  }, "Submit")), React.createElement(ModalSpinner, {
+  }, formItems), React.createElement(ModalSpinner, {
     isOpen: modal.open,
     type: modal.type,
     message: modal.message,

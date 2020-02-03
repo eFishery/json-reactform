@@ -92,7 +92,8 @@ function usePrevious(value) {
 
 var index = function(_ref2) {
   var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, defaultState = Object.keys(model).reduce((function(a, b) {
-    return a[b] = "date" === model[b].type ? (new Date).toISOString() : "", a;
+    return a[b] = "date" === model[b].type ? (new Date).toISOString() : "checkbox" === model[b].type ? [] : "", 
+    a;
   }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], prevState = usePrevious(state), _React$useState2 = React.useState({
     open: !1,
     type: "loading",
@@ -160,7 +161,69 @@ var index = function(_ref2) {
       onChange: function(e) {
         return e.preventDefault();
       }
-    })) : React.createElement(reactstrap.Spinner, null)))) : formItems.push(React.createElement(reactstrap.FormGroup, {
+    })) : React.createElement(reactstrap.Spinner, null)))) : "checkbox" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+      key: key,
+      row: !0,
+      className: "mb-4"
+    }, React.createElement(reactstrap.Label, {
+      for: key,
+      sm: 4
+    }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
+      sm: 8,
+      className: "d-flex flex-column"
+    }, model[key].options.map((function(item, index) {
+      return React.createElement(reactstrap.CustomInput, {
+        type: "checkbox",
+        label: item.label,
+        id: item.value,
+        key: item.value,
+        name: key,
+        value: item.value,
+        checked: state[key].includes(item.value),
+        required: 0 === index && 0 === state[key].length && model[key].required,
+        onChange: function(e) {
+          return function(key, value) {
+            var changedObject = {};
+            changedObject[key] = state[key].includes(value) ? state[key].filter((function(item) {
+              return item != value;
+            })) : [].concat(state[key], [ value ]), setState(_extends({}, state, {}, changedObject));
+          }(key, e.target.value);
+        }
+      });
+    }))))) : "radio" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+      key: key,
+      row: !0,
+      className: "mb-4"
+    }, React.createElement(reactstrap.Label, {
+      for: key,
+      sm: 4
+    }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
+      sm: 8,
+      className: "d-flex flex-column"
+    }, model[key].options.map((function(item, index) {
+      return React.createElement(reactstrap.CustomInput, {
+        type: "radio",
+        label: item.label,
+        id: item.value,
+        key: item.value,
+        name: key,
+        value: item.value,
+        checked: state[key].includes(item.value),
+        required: model[key].required,
+        onChange: onChangeState
+      });
+    }))))) : "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
+      key: key,
+      row: !0,
+      className: "mb-4"
+    }, React.createElement(reactstrap.Col, {
+      sm: 4
+    }), React.createElement(reactstrap.Col, {
+      sm: 8
+    }, React.createElement(reactstrap.Button, {
+      type: model[key].type,
+      color: "success"
+    }, key)))) : formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"
@@ -220,9 +283,7 @@ var index = function(_ref2) {
         }));
       }));
     }
-  }, formItems, React.createElement(reactstrap.Button, {
-    color: "success"
-  }, "Submit")), React.createElement(ModalSpinner, {
+  }, formItems), React.createElement(ModalSpinner, {
     isOpen: modal.open,
     type: modal.type,
     message: modal.message,
