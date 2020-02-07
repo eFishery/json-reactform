@@ -8,68 +8,7 @@ var React = _interopDefault(require('react'));
 var reactstrap = require('reactstrap');
 var DatePicker = _interopDefault(require('react-datepicker'));
 require('react-datepicker/dist/react-datepicker.css');
-var PropTypes = _interopDefault(require('prop-types'));
-var md = require('react-icons/md');
 var Select = _interopDefault(require('react-select'));
-
-var ModalSpinner = function ModalSpinner(_ref) {
-  var _ref$isOpen = _ref.isOpen,
-      isOpen = _ref$isOpen === void 0 ? false : _ref$isOpen,
-      _ref$message = _ref.message,
-      message = _ref$message === void 0 ? '' : _ref$message,
-      _ref$type = _ref.type,
-      type = _ref$type === void 0 ? '' : _ref$type,
-      _ref$onAccept = _ref.onAccept,
-      onAccept = _ref$onAccept === void 0 ? function () {
-    return false;
-  } : _ref$onAccept,
-      _ref$onDismiss = _ref.onDismiss,
-      onDismiss = _ref$onDismiss === void 0 ? function () {
-    return false;
-  } : _ref$onDismiss,
-      _ref$btnAcceptId = _ref.btnAcceptId,
-      btnAcceptId = _ref$btnAcceptId === void 0 ? '' : _ref$btnAcceptId;
-  return React.createElement(reactstrap.Modal, {
-    isOpen: isOpen,
-    centered: true,
-    returnFocusAfterClose: false,
-    backdrop: "static"
-  }, React.createElement(reactstrap.ModalHeader, null, "Pop-Up Message"), React.createElement(reactstrap.ModalBody, {
-    className: "d-flex align-items-center font-weight-bold"
-  }, type === 'loading' ? React.createElement(reactstrap.Spinner, {
-    color: "success",
-    className: "mr-2"
-  }) : null, type === 'success' ? React.createElement(md.MdCheckCircle, {
-    className: "text-success",
-    size: 30
-  }) : null, type === 'error' ? React.createElement(md.MdError, {
-    className: "text-danger",
-    size: 30
-  }) : null, type === 'confirm' ? React.createElement(md.MdQuestionAnswer, {
-    className: "text-dark",
-    size: 30
-  }) : null, React.createElement("span", {
-    style: {
-      fontSize: '18px'
-    },
-    className: "ml-3"
-  }, message)), type !== 'loading' ? React.createElement(reactstrap.ModalFooter, null, React.createElement(reactstrap.Button, {
-    color: "danger",
-    onClick: onDismiss
-  }, type === 'confirm' ? 'Cancel' : 'Close'), type === 'confirm' ? React.createElement(reactstrap.Button, {
-    color: "primary",
-    id: btnAcceptId,
-    onClick: onAccept
-  }, "Yes") : null) : null);
-};
-
-ModalSpinner.propTypes = {
-  isOpen: PropTypes.bool,
-  message: PropTypes.string,
-  type: PropTypes.oneOf(['loading', 'success', 'error', 'confirm']),
-  onDismiss: PropTypes.func,
-  onAccept: PropTypes.func
-};
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 var CustomDatePicker = React.forwardRef(function (_ref, ref) {
@@ -111,51 +50,11 @@ var index = (function (_ref2) {
       setState = _React$useState[1];
 
   var prevState = usePrevious(state);
-
-  var _React$useState2 = React.useState({
-    open: false,
-    type: 'loading',
-    // success, error
-    message: ''
-  }),
-      modal = _React$useState2[0],
-      setModal = _React$useState2[1];
-
-  var clearRequest = function clearRequest() {
-    cancelSource.cancel('component unmounted');
-  };
-
   var formItems = [];
 
   var onFormSubmit = function onFormSubmit(e) {
     e.preventDefault();
-    setModal(function (values) {
-      return _extends({}, values, {
-        type: 'loading',
-        message: 'Saving..',
-        open: true
-      });
-    });
-    var newState = Object.keys(state).reduce(function (a, b) {
-      return a[b] = model[b].type === 'number' ? parseInt(state[b]) : state[b], a;
-    }, {});
-    onSubmit(newState).then(function () {
-      setState(defaultState);
-      setModal(function (values) {
-        return _extends({}, values, {
-          type: 'success',
-          message: 'Success'
-        });
-      });
-    })["catch"](function (err) {
-      console.log("GAGAL", err);
-      setModal(function (values) {
-        return _extends({}, values, {
-          type: 'error',
-          message: 'Failed to Save'
-        });
-      });
-    });
+    onSubmit(state);
   };
 
   var onChangeState = function onChangeState(e) {
@@ -289,7 +188,7 @@ var index = (function (_ref2) {
       }, key, " ", model[key].required ? '*' : null), React.createElement(reactstrap.Col, {
         sm: 8,
         className: "d-flex flex-column"
-      }, model[key].options.map(function (item, index) {
+      }, model[key].options.map(function (item) {
         return React.createElement(reactstrap.CustomInput, {
           type: "radio",
           label: item.label,
@@ -297,7 +196,7 @@ var index = (function (_ref2) {
           key: item.value,
           name: key,
           value: item.value,
-          checked: state[key].includes(item.value),
+          checked: state[key] === item.value,
           required: model[key].required,
           onChange: onChangeState
         });
@@ -337,11 +236,6 @@ var index = (function (_ref2) {
     }
   });
   React.useEffect(function () {
-    return function () {
-      clearRequest();
-    };
-  }, []);
-  React.useEffect(function () {
     if (onChange) {
       var changedObject = [];
 
@@ -360,18 +254,7 @@ var index = (function (_ref2) {
   }, [state]);
   return React.createElement(React.Fragment, null, React.createElement(reactstrap.Form, {
     onSubmit: onFormSubmit
-  }, formItems), React.createElement(ModalSpinner, {
-    isOpen: modal.open,
-    type: modal.type,
-    message: modal.message,
-    onDismiss: function onDismiss() {
-      return setModal(function (values) {
-        return _extends({}, values, {
-          open: false
-        });
-      });
-    }
-  }));
+  }, formItems));
 });
 
 exports.default = index;
