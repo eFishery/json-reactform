@@ -39,6 +39,7 @@ Then define JSON schema with format:
 export default {
   "Plan Date": {
     "type": "date",
+    "format": "dd MMMM yyyy",
     "required": true
   },
   "Qty": {

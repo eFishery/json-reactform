@@ -210,7 +210,7 @@ var index = (function (_ref2) {
         onChange: function onChange(value) {
           return onChangeStateDate(key, value);
         },
-        dateFormat: "dd/MM/yyyy",
+        dateFormat: model[key].format || "dd-MM-yyyy",
         customInput: React.createElement(CustomDatePicker, null)
       }))));
     } else if (model[key].type === 'select') {

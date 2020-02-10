@@ -26,6 +26,7 @@ const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, o
 		onClick={onClick}
 	/>
 ));
+
 function usePrevious(value) {
   const ref = React.useRef();
   React.useEffect(() => {
@@ -36,21 +37,27 @@ function usePrevious(value) {
 
 export default ({model,onSubmit,onChange}) => {
 	const defaultState = Object.keys(model).reduce((a, b) => {
-		return (a[b] = model[b].type === 'date' ? 
+		return (a[b] = model[b].type === 'date' ?
 			new Date().toISOString() : (model[b].type === 'checkbox' ? [] : "")
 			, a)
 	}, {})
+
 	const [state, setState] = React.useState(defaultState)
+
 	const prevState = usePrevious(state);
+
 	const [modal, setModal] = React.useState({
 		open: false,
 		type: 'loading', // success, error
 		message: ''
 	})
+
 	const clearRequest = () => {
     cancelSource.cancel('component unmounted')
 	}
+
 	const formItems = [];
+
 	const onFormSubmit = (e) => {
 		e.preventDefault();
 		setModal(values => ({ ...values, type: 'loading', message: 'Saving..', open: true}));
@@ -65,8 +72,7 @@ export default ({model,onSubmit,onChange}) => {
 			setModal(values => ({ ...values, type: 'error', message: 'Failed to Save'}));
 		})
 	}
-	
-	
+
 	const onChangeState = (e) => {
 		const changedObject = {}
 		const {
@@ -122,13 +128,12 @@ export default ({model,onSubmit,onChange}) => {
 							name={key}
 							selected={new Date(state[key])}
 							onChange={value => onChangeStateDate(key, value)}
-							dateFormat="dd/MM/yyyy"
+							dateFormat={model[key].format || "dd-MM-yyyy"}
 							customInput={<CustomDatePicker />}
 						/>
 					</Col>
 				</FormGroup>
 			)
-
 		}
 		else if (model[key].type === 'select') {
 			formItems.push(
@@ -163,7 +168,6 @@ export default ({model,onSubmit,onChange}) => {
 									<Spinner />
 								)
 						})()}
-
 					</Col>
 				</FormGroup>
 			)
@@ -175,14 +179,14 @@ export default ({model,onSubmit,onChange}) => {
 					<Col sm={8} className="d-flex flex-column">
 					{
 						model[key].options.map((item, index) => {
-							return <CustomInput 
+							return <CustomInput
 								type="checkbox"
 								label={item.label}
 								id={item.value}
 								key={item.value}
 								name={key}
 								value={item.value}
-								checked={state[key].includes(item.value)} 
+								checked={state[key].includes(item.value)}
 								required={index === 0 && state[key].length === 0 && model[key].required}
 								onChange={(e) => onChangeStateCheckbox(key, e.target.value)} />
 						})
@@ -198,14 +202,14 @@ export default ({model,onSubmit,onChange}) => {
 					<Col sm={8} className="d-flex flex-column">
 					{
 						model[key].options.map((item, index) => {
-							return <CustomInput 
+							return <CustomInput
 								type="radio"
 								label={item.label}
 								id={item.value}
 								key={item.value}
 								name={key}
 								value={item.value}
-								checked={state[key].includes(item.value)} 
+								checked={state[key].includes(item.value)}
 								required={model[key].required}
 								onChange={onChangeState} />
 						})
@@ -260,7 +264,7 @@ export default ({model,onSubmit,onChange}) => {
 		}
 	}, [state])
 
-	
+
 	return (
 		<>
 			<Form onSubmit={onFormSubmit}>

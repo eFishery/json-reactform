@@ -123,7 +123,7 @@ var index = function(_ref2) {
           changedObject[key] = value.toISOString(), setState(_extends({}, state, {}, changedObject));
         }(key, value);
       },
-      dateFormat: "dd/MM/yyyy",
+      dateFormat: model[key].format || "dd-MM-yyyy",
       customInput: React.createElement(CustomDatePicker, null)
     })))) : "select" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
