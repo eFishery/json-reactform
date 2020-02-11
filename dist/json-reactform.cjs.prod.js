@@ -52,6 +52,14 @@ var PropTypes = _interopDefault(require("prop-types")), md = require("react-icon
   }, "Yes") : null) : null);
 };
 
+function numberToCurrency(n) {
+  return ("string" != typeof n ? String(n) : n).replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function currencyToNumber(n) {
+  return ("string" != typeof n ? String(n) : n).replace(/[\,\.]/g, "");
+}
+
 function _extends() {
   return (_extends = Object.assign || function(target) {
     for (var i = 1; i < arguments.length; i++) {
@@ -95,13 +103,19 @@ var index = function(_ref2) {
   var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, defaultState = Object.keys(model).reduce((function(a, b) {
     return a[b] = "date" === model[b].type ? (new Date).toISOString() : "checkbox" === model[b].type ? [] : "", 
     a;
-  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], prevState = usePrevious(state), _React$useState2 = React.useState({
+  }), {}), defaultCurrency = Object.keys(model).reduce((function(a, b) {
+    return "currency" === model[b].type && (a[b] = ""), a;
+  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], prevState = usePrevious(state), _React$useState3 = React.useState({
     open: !1,
     type: "loading",
     message: ""
-  }), modal = _React$useState2[0], setModal = _React$useState2[1], formItems = [], onChangeState = function(e) {
+  }), modal = _React$useState3[0], setModal = _React$useState3[1], formItems = [], onChangeState = function(e) {
     var changedObject = {}, _e$currentTarget = e.currentTarget, value = _e$currentTarget.value;
     changedObject[_e$currentTarget.name] = value, setState(_extends({}, state, {}, changedObject));
+  }, onChangeCurrency = function(e) {
+    var changedObject = {}, currencyObject = {}, _e$currentTarget2 = e.currentTarget, value = _e$currentTarget2.value, name = _e$currentTarget2.name;
+    changedObject[name] = currencyToNumber(value), setState(_extends({}, state, {}, changedObject)), 
+    currencyObject[name] = numberToCurrency(value), setCurrency(_extends({}, currency, {}, currencyObject));
   };
   return Object.keys(model).forEach((function(key) {
     "date" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
@@ -217,7 +231,25 @@ var index = function(_ref2) {
         disabled: model[key].disabled,
         onChange: onChangeState
       });
-    }))))) : "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
+    }))))) : "currency" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+      key: key,
+      row: !0,
+      className: "mb-4"
+    }, React.createElement(reactstrap.Label, {
+      for: key,
+      sm: 4
+    }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
+      sm: 8,
+      className: "d-flex flex-column"
+    }, React.createElement(reactstrap.Input, {
+      type: "text",
+      onChange: onChangeCurrency,
+      value: currency[key],
+      name: key,
+      id: key,
+      required: model[key].required,
+      disabled: model[key].disabled
+    })))) : "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
       key: key,
       className: "mb-4"
     }, React.createElement(reactstrap.Col, {
@@ -281,7 +313,7 @@ var index = function(_ref2) {
           });
         }));
       })).catch((function(err) {
-        console.log("GAGAL", err), setModal((function(values) {
+        setModal((function(values) {
           return _extends({}, values, {
             type: "error",
             message: "Failed to Save"

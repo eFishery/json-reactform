@@ -71,6 +71,17 @@ ModalSpinner.propTypes = {
   onAccept: PropTypes.func
 };
 
+function numberToCurrency(n) {
+  // format number 1000000 to 1,234,567
+  var str = typeof n !== 'string' ? String(n) : n;
+  return str.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+function currencyToNumber(n) {
+  // format number 1,234,567 to 1000000
+  var str = typeof n !== 'string' ? String(n) : n;
+  return str.replace(/[\,\.]/g, "");
+}
+
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 var CustomDatePicker = React.forwardRef(function (_ref, ref) {
   var onChange = _ref.onChange,
@@ -107,21 +118,32 @@ var index = (function (_ref2) {
   var defaultState = Object.keys(model).reduce(function (a, b) {
     return a[b] = model[b].type === 'date' ? new Date().toISOString() : model[b].type === 'checkbox' ? [] : "", a;
   }, {});
+  var defaultCurrency = Object.keys(model).reduce(function (a, b) {
+    if (model[b].type === 'currency') {
+      a[b] = '';
+    }
+
+    return a;
+  }, {});
 
   var _React$useState = React.useState(defaultState),
       state = _React$useState[0],
       setState = _React$useState[1];
 
+  var _React$useState2 = React.useState(defaultCurrency),
+      currency = _React$useState2[0],
+      setCurrency = _React$useState2[1];
+
   var prevState = usePrevious(state);
 
-  var _React$useState2 = React.useState({
+  var _React$useState3 = React.useState({
     open: false,
     type: 'loading',
     // success, error
     message: ''
   }),
-      modal = _React$useState2[0],
-      setModal = _React$useState2[1];
+      modal = _React$useState3[0],
+      setModal = _React$useState3[1];
 
   var clearRequest = function clearRequest() {
     cancelSource.cancel('component unmounted');
@@ -150,7 +172,6 @@ var index = (function (_ref2) {
         });
       });
     })["catch"](function (err) {
-      console.log("GAGAL", err);
       setModal(function (values) {
         return _extends({}, values, {
           type: 'error',
@@ -168,6 +189,19 @@ var index = (function (_ref2) {
 
     changedObject[name] = value;
     setState(_extends({}, state, {}, changedObject));
+  };
+
+  var onChangeCurrency = function onChangeCurrency(e) {
+    var changedObject = {};
+    var currencyObject = {};
+    var _e$currentTarget2 = e.currentTarget,
+        value = _e$currentTarget2.value,
+        name = _e$currentTarget2.name; // const value = e.currentTarget.value
+
+    changedObject[name] = currencyToNumber(value);
+    setState(_extends({}, state, {}, changedObject));
+    currencyObject[name] = numberToCurrency(value);
+    setCurrency(_extends({}, currency, {}, currencyObject));
   }; // khususon onchange si react-select
 
 
@@ -307,6 +341,26 @@ var index = (function (_ref2) {
           disabled: model[key].disabled,
           onChange: onChangeState
         });
+      }))));
+    } else if (model[key].type === 'currency') {
+      formItems.push(React.createElement(reactstrap.FormGroup, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(reactstrap.Label, {
+        "for": key,
+        sm: 4
+      }, key, " ", model[key].required ? '*' : null), React.createElement(reactstrap.Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, React.createElement(reactstrap.Input, {
+        type: "text",
+        onChange: onChangeCurrency,
+        value: currency[key],
+        name: key,
+        id: key,
+        required: model[key].required,
+        disabled: model[key].disabled
       }))));
     } else if (model[key].type === 'submit') {
       formItems.push(React.createElement(reactstrap.Row, {

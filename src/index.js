@@ -14,6 +14,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalSpinner from './components/ModalSpinner';
 import Select from 'react-select';
+import { numberToCurrency, currencyToNumber } from './libs/helper'
 
 const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name, disabled }, ref) => (
 	<Input
@@ -42,8 +43,15 @@ export default ({model,onSubmit,onChange}) => {
 			new Date().toISOString() : (model[b].type === 'checkbox' ? [] : "")
 			, a)
 	}, {})
+	const defaultCurrency = Object.keys(model).reduce((a, b) => {
+		if (model[b].type === 'currency') {
+			a[b] = ''
+		}
+		return a
+	}, {})
 
 	const [state, setState] = React.useState(defaultState)
+	const [currency, setCurrency] = React.useState(defaultCurrency)
 
 	const prevState = usePrevious(state);
 
@@ -69,7 +77,6 @@ export default ({model,onSubmit,onChange}) => {
 			setState(defaultState);
 			setModal(values => ({ ...values, type: 'success', message: 'Success'}));
 		}).catch(err => {
-			console.log("GAGAL", err);
 			setModal(values => ({ ...values, type: 'error', message: 'Failed to Save'}));
 		})
 	}
@@ -85,6 +92,26 @@ export default ({model,onSubmit,onChange}) => {
 		setState({
 			...state,
 			...changedObject
+		})
+	}
+
+	const onChangeCurrency = (e) => {
+		const changedObject = {}
+		const currencyObject = {}
+		const {
+			value,
+			name
+		} = e.currentTarget;
+		// const value = e.currentTarget.value
+		changedObject[name] = currencyToNumber(value);
+		setState({
+			...state,
+			...changedObject
+		})
+		currencyObject[name] = numberToCurrency(value)
+		setCurrency({
+			...currency,
+			...currencyObject
 		})
 	}
 
@@ -220,6 +247,23 @@ export default ({model,onSubmit,onChange}) => {
 								onChange={onChangeState} />
 						})
 					}
+					</Col>
+				</FormGroup>
+			)
+		}
+		else if (model[key].type === 'currency') {
+			formItems.push(
+				<FormGroup key={key} row className="mb-4">
+					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
+					<Col sm={8} className="d-flex flex-column">
+						<Input
+							type='text'
+							onChange={onChangeCurrency}
+							value={currency[key]}
+							name={key} id={key}
+							required={model[key].required}
+							disabled={model[key].disabled}
+						/>
 					</Col>
 				</FormGroup>
 			)
