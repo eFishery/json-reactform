@@ -71,7 +71,7 @@ ModalSpinner.propTypes = {
 };
 
 var CustomDatePicker = React.forwardRef((function(_ref, ref) {
-  var onChange = _ref.onChange, placeholder = _ref.placeholder, value = _ref.value, id = _ref.id, onClick = _ref.onClick, name = _ref.name;
+  var onChange = _ref.onChange, placeholder = _ref.placeholder, value = _ref.value, id = _ref.id, onClick = _ref.onClick, name = _ref.name, disabled = _ref.disabled;
   return React.createElement(reactstrap.Input, {
     ref: ref,
     onChange: onChange,
@@ -79,7 +79,8 @@ var CustomDatePicker = React.forwardRef((function(_ref, ref) {
     value: value,
     id: id,
     name: name,
-    onClick: onClick
+    onClick: onClick,
+    disabled: disabled
   });
 }));
 
@@ -124,7 +125,8 @@ var index = function(_ref2) {
         }(key, value);
       },
       dateFormat: model[key].format || "dd-MM-yyyy",
-      customInput: React.createElement(CustomDatePicker, null)
+      customInput: React.createElement(CustomDatePicker, null),
+      disabled: model[key].disabled
     })))) : "select" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
@@ -148,7 +150,8 @@ var index = function(_ref2) {
         void setState(_extends({}, state, {}, changedObject));
         var selectedOption, changedObject;
       },
-      options: model[key].options
+      options: model[key].options,
+      isDisabled: model[key].disabled
     }), React.createElement("input", {
       tabIndex: -1,
       autoComplete: "off",
@@ -181,6 +184,7 @@ var index = function(_ref2) {
         value: item.value,
         checked: state[key].includes(item.value),
         required: 0 === index && 0 === state[key].length && model[key].required,
+        disabled: model[key].disabled,
         onChange: function(e) {
           return function(key, value) {
             var changedObject = {};
@@ -210,11 +214,11 @@ var index = function(_ref2) {
         value: item.value,
         checked: state[key].includes(item.value),
         required: model[key].required,
+        disabled: model[key].disabled,
         onChange: onChangeState
       });
     }))))) : "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
       key: key,
-      row: !0,
       className: "mb-4"
     }, React.createElement(reactstrap.Col, {
       sm: 4
@@ -222,7 +226,8 @@ var index = function(_ref2) {
       sm: 8
     }, React.createElement(reactstrap.Button, {
       type: model[key].type,
-      color: "success"
+      color: "success",
+      disabled: model[key].disabled
     }, key)))) : formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
@@ -239,7 +244,8 @@ var index = function(_ref2) {
       value: state[key],
       name: key,
       id: key,
-      required: model[key].required
+      required: model[key].required,
+      disabled: model[key].disabled
     }))));
   })), React.useEffect((function() {
     return function() {

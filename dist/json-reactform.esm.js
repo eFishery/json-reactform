@@ -72,7 +72,8 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
       value = _ref.value,
       id = _ref.id,
       onClick = _ref.onClick,
-      name = _ref.name;
+      name = _ref.name,
+      disabled = _ref.disabled;
   return React.createElement(Input, {
     ref: ref,
     onChange: onChange,
@@ -80,7 +81,8 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
     value: value,
     id: id,
     name: name,
-    onClick: onClick
+    onClick: onClick,
+    disabled: disabled
   });
 });
 
@@ -205,7 +207,8 @@ var index = (function (_ref2) {
           return onChangeStateDate(key, value);
         },
         dateFormat: model[key].format || "dd-MM-yyyy",
-        customInput: React.createElement(CustomDatePicker, null)
+        customInput: React.createElement(CustomDatePicker, null),
+        disabled: model[key].disabled
       }))));
     } else if (model[key].type === 'select') {
       formItems.push(React.createElement(FormGroup, {
@@ -230,7 +233,8 @@ var index = (function (_ref2) {
           onChange: function onChange(option) {
             return onChangeStateSelect(key, option);
           },
-          options: model[key].options
+          options: model[key].options,
+          isDisabled: model[key].disabled
         }), React.createElement("input", {
           // this field hidden, for detect validation only
           tabIndex: -1,
@@ -267,6 +271,7 @@ var index = (function (_ref2) {
           value: item.value,
           checked: state[key].includes(item.value),
           required: index === 0 && state[key].length === 0 && model[key].required,
+          disabled: model[key].disabled,
           onChange: function onChange(e) {
             return onChangeStateCheckbox(key, e.target.value);
           }
@@ -293,13 +298,13 @@ var index = (function (_ref2) {
           value: item.value,
           checked: state[key].includes(item.value),
           required: model[key].required,
+          disabled: model[key].disabled,
           onChange: onChangeState
         });
       }))));
     } else if (model[key].type === 'submit') {
       formItems.push(React.createElement(Row, {
         key: key,
-        row: true,
         className: "mb-4"
       }, React.createElement(Col, {
         sm: 4
@@ -307,7 +312,8 @@ var index = (function (_ref2) {
         sm: 8
       }, React.createElement(Button, {
         type: model[key].type,
-        color: "success"
+        color: "success",
+        disabled: model[key].disabled
       }, key))));
     } else {
       formItems.push(React.createElement(FormGroup, {
@@ -326,7 +332,8 @@ var index = (function (_ref2) {
         value: state[key],
         name: key,
         id: key,
-        required: model[key].required
+        required: model[key].required,
+        disabled: model[key].disabled
       }))));
     }
   });

@@ -15,7 +15,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalSpinner from './components/ModalSpinner';
 import Select from 'react-select';
 
-const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name }, ref) => (
+const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name, disabled }, ref) => (
 	<Input
 		ref={ref}
 		onChange={onChange}
@@ -24,6 +24,7 @@ const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, o
 		id={id}
 		name={name}
 		onClick={onClick}
+		disabled={disabled}
 	/>
 ));
 
@@ -130,6 +131,7 @@ export default ({model,onSubmit,onChange}) => {
 							onChange={value => onChangeStateDate(key, value)}
 							dateFormat={model[key].format || "dd-MM-yyyy"}
 							customInput={<CustomDatePicker />}
+							disabled={model[key].disabled}
 						/>
 					</Col>
 				</FormGroup>
@@ -154,6 +156,7 @@ export default ({model,onSubmit,onChange}) => {
 											value={state[key]}
 											onChange={option => onChangeStateSelect(key, option)}
 											options={model[key].options}
+											isDisabled={model[key].disabled}
 										/>
 										<input // this field hidden, for detect validation only
 											tabIndex={-1}
@@ -188,7 +191,9 @@ export default ({model,onSubmit,onChange}) => {
 								value={item.value}
 								checked={state[key].includes(item.value)}
 								required={index === 0 && state[key].length === 0 && model[key].required}
-								onChange={(e) => onChangeStateCheckbox(key, e.target.value)} />
+								disabled={model[key].disabled}
+								onChange={(e) => onChangeStateCheckbox(key, e.target.value)}
+							/>
 						})
 					}
 					</Col>
@@ -211,6 +216,7 @@ export default ({model,onSubmit,onChange}) => {
 								value={item.value}
 								checked={state[key].includes(item.value)}
 								required={model[key].required}
+								disabled={model[key].disabled}
 								onChange={onChangeState} />
 						})
 					}
@@ -220,10 +226,10 @@ export default ({model,onSubmit,onChange}) => {
 		}
 		else if (model[key].type === 'submit') {
 			formItems.push(
-				<Row key={key} row className="mb-4">
+				<Row key={key} className="mb-4">
 					<Col sm={4}></Col>
 					<Col sm={8}>
-						<Button type={model[key].type} color="success">{key}</Button>
+						<Button type={model[key].type} color="success" disabled={model[key].disabled}>{key}</Button>
 					</Col>
 				</Row>
 			)
@@ -233,7 +239,14 @@ export default ({model,onSubmit,onChange}) => {
 				<FormGroup key={key} row className="mb-4">
 					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
 					<Col sm={8} className="d-flex flex-column">
-						<Input type={model[key].type} onChange={onChangeState} value={state[key]} name={key} id={key} required={model[key].required} />
+						<Input
+							type={model[key].type}
+							onChange={onChangeState}
+							value={state[key]}
+							name={key} id={key}
+							required={model[key].required}
+							disabled={model[key].disabled}
+						/>
 					</Col>
 				</FormGroup>
 			)
