@@ -162,7 +162,6 @@ var index = (function (_ref2) {
       options = _React$useState3[0],
       setOptions = _React$useState3[1];
 
-  console.log('state', state);
   var prevState = usePrevious(state);
 
   var _React$useState4 = React.useState({

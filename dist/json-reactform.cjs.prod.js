@@ -112,9 +112,7 @@ var index = function(_ref2) {
     a;
   }), {}), defaultOptions = Object.keys(model).reduce((function(a, b) {
     return "select" === model[b].type && (a[b] = model[b].options), a;
-  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], _React$useState3 = React.useState(defaultOptions), options = _React$useState3[0], setOptions = _React$useState3[1];
-  console.log("state", state);
-  var prevState = usePrevious(state), _React$useState4 = React.useState({
+  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], _React$useState3 = React.useState(defaultOptions), options = _React$useState3[0], setOptions = _React$useState3[1], prevState = usePrevious(state), _React$useState4 = React.useState({
     open: !1,
     type: "loading",
     message: ""
