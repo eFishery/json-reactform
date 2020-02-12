@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-	Form,
-	Button,
-	FormGroup,
-	Label,
+Form,
+Button,
+FormGroup,
+Label,
 	Input,
 	Col,
 	Spinner,
@@ -17,7 +17,8 @@ import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { numberToCurrency, currencyToNumber } from './libs/helper'
 
-const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name, disabled }, ref) => (
+const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name, disabled }, ref) => {
+	return (
 	<Input
 		ref={ref}
 		onChange={onChange}
@@ -28,7 +29,7 @@ const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, o
 		onClick={onClick}
 		disabled={disabled}
 	/>
-));
+)});
 
 function usePrevious(value) {
   const ref = React.useRef();
@@ -40,16 +41,27 @@ function usePrevious(value) {
 
 export default ({model,onSubmit,onChange}) => {
 	const defaultState = Object.keys(model).reduce((a, b) => {
-		return (a[b] = model[b].type === 'date' ?
-			new Date().toISOString() : (model[b].type === 'checkbox' ? [] : "")
-			, a)
-	}, {})
-	const defaultCurrency = Object.keys(model).reduce((a, b) => {
-		if (model[b].type === 'currency') {
-			a[b] = ''
+		const { defaultValue } = model[b]
+		if (model[b].type === 'date') {
+			a[b] = defaultValue ? defaultValue.toISOString() : new Date().toISOString()
+		} else if (model[b].type === 'select') {
+			a[b] = defaultValue ? model[b].options.find(option => option.value === defaultValue) : ""
+		} else if (model[b].type === 'checkbox') {
+			a[b] = defaultValue && defaultValue.length ? defaultValue : []
+		} else {
+			a[b] = defaultValue || ""
 		}
 		return a
 	}, {})
+
+	const defaultCurrency = Object.keys(model).reduce((a, b) => {
+		const { defaultValue } = model[b]
+		if (model[b].type === 'currency') {
+			a[b] = numberToCurrency(defaultValue) || ""
+		}
+		return a
+	}, {})
+
 	const defaultOptions = Object.keys(model).reduce((a, b) => {
 		if (model[b].type === 'select') {
 			a[b] = model[b].options
@@ -60,8 +72,6 @@ export default ({model,onSubmit,onChange}) => {
 	const [state, setState] = React.useState(defaultState)
 	const [currency, setCurrency] = React.useState(defaultCurrency)
 	const [options, setOptions] = React.useState(defaultOptions)
-	window.options = options
-	console.log('options', options)
 
 	const prevState = usePrevious(state);
 
@@ -179,6 +189,7 @@ export default ({model,onSubmit,onChange}) => {
 							dateFormat={model[key].format || "dd-MM-yyyy"}
 							customInput={<CustomDatePicker />}
 							disabled={model[key].disabled}
+							placeholderText={model[key].placeholder}
 						/>
 					</Col>
 				</FormGroup>
@@ -191,7 +202,6 @@ export default ({model,onSubmit,onChange}) => {
 					<Col sm={8} className="d-flex flex-column">
 						{(() => {
 							const SelectComponent = model[key].createable ? CreatableSelect : Select;
-							console.log(model[key], model[key].createable)
 							return options[key].length > 0 ?
 								(
 									<>
@@ -201,12 +211,12 @@ export default ({model,onSubmit,onChange}) => {
 											searchable={true}
 											isClearable={true}
 											required={model[key].required}
-											defaultValue={model[key].options[0].value || ''}
 											value={state[key]}
 											options={options[key]}
 											onChange={option => onChangeStateSelect(key, option)}
 											onCreateOption={(inputValue) => onCreateOptionSelect(key, inputValue, model[key].onCreateOption)}
 											isDisabled={model[key].disabled}
+											placeholder={model[key].placeholder}
 										/>
 										<input // this field hidden, for detect validation only
 											tabIndex={-1}
@@ -286,6 +296,7 @@ export default ({model,onSubmit,onChange}) => {
 							name={key} id={key}
 							required={model[key].required}
 							disabled={model[key].disabled}
+							placeholder={model[key].placeholder}
 						/>
 					</Col>
 				</FormGroup>
@@ -313,6 +324,7 @@ export default ({model,onSubmit,onChange}) => {
 							name={key} id={key}
 							required={model[key].required}
 							disabled={model[key].disabled}
+							placeholder={model[key].placeholder}
 						/>
 					</Col>
 				</FormGroup>

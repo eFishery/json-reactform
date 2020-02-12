@@ -101,14 +101,19 @@ function usePrevious(value) {
 
 var index = function(_ref2) {
   var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, defaultState = Object.keys(model).reduce((function(a, b) {
-    return a[b] = "date" === model[b].type ? (new Date).toISOString() : "checkbox" === model[b].type ? [] : "", 
+    var defaultValue = model[b].defaultValue;
+    return "date" === model[b].type ? a[b] = defaultValue ? defaultValue.toISOString() : (new Date).toISOString() : "select" === model[b].type ? a[b] = defaultValue ? model[b].options.find((function(option) {
+      return option.value === defaultValue;
+    })) : "" : "checkbox" === model[b].type ? a[b] = defaultValue && defaultValue.length ? defaultValue : [] : a[b] = defaultValue || "", 
     a;
   }), {}), defaultCurrency = Object.keys(model).reduce((function(a, b) {
-    return "currency" === model[b].type && (a[b] = ""), a;
+    var defaultValue = model[b].defaultValue;
+    return "currency" === model[b].type && (a[b] = numberToCurrency(defaultValue) || ""), 
+    a;
   }), {}), defaultOptions = Object.keys(model).reduce((function(a, b) {
     return "select" === model[b].type && (a[b] = model[b].options), a;
   }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], _React$useState3 = React.useState(defaultOptions), options = _React$useState3[0], setOptions = _React$useState3[1];
-  window.options = options, console.log("options", options);
+  console.log("state", state);
   var prevState = usePrevious(state), _React$useState4 = React.useState({
     open: !1,
     type: "loading",
@@ -145,7 +150,8 @@ var index = function(_ref2) {
       },
       dateFormat: model[key].format || "dd-MM-yyyy",
       customInput: React.createElement(CustomDatePicker, null),
-      disabled: model[key].disabled
+      disabled: model[key].disabled,
+      placeholderText: model[key].placeholder
     })))) : "select" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
@@ -156,14 +162,12 @@ var index = function(_ref2) {
     }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
       sm: 8,
       className: "d-flex flex-column"
-    }, (SelectComponent = model[key].createable ? CreatableSelect : Select, console.log(model[key], model[key].createable), 
-    options[key].length > 0 ? React.createElement(React.Fragment, null, React.createElement(SelectComponent, {
+    }, (SelectComponent = model[key].createable ? CreatableSelect : Select, options[key].length > 0 ? React.createElement(React.Fragment, null, React.createElement(SelectComponent, {
       name: key,
       id: key,
       searchable: !0,
       isClearable: !0,
       required: model[key].required,
-      defaultValue: model[key].options[0].value || "",
       value: state[key],
       options: options[key],
       onChange: function(option) {
@@ -177,7 +181,8 @@ var index = function(_ref2) {
           optionsObject[name] = [].concat(options[name], [ newOptionObject ]), setOptions(_extends({}, options, {}, optionsObject));
         }(key, inputValue, model[key].onCreateOption);
       },
-      isDisabled: model[key].disabled
+      isDisabled: model[key].disabled,
+      placeholder: model[key].placeholder
     }), React.createElement("input", {
       tabIndex: -1,
       autoComplete: "off",
@@ -260,7 +265,8 @@ var index = function(_ref2) {
       name: key,
       id: key,
       required: model[key].required,
-      disabled: model[key].disabled
+      disabled: model[key].disabled,
+      placeholder: model[key].placeholder
     })))) : "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
       key: key,
       className: "mb-4"
@@ -289,7 +295,8 @@ var index = function(_ref2) {
       name: key,
       id: key,
       required: model[key].required,
-      disabled: model[key].disabled
+      disabled: model[key].disabled,
+      placeholder: model[key].placeholder
     }))));
   })), React.useEffect((function() {
     return function() {

@@ -111,11 +111,27 @@ var index = (function (_ref2) {
       onSubmit = _ref2.onSubmit,
       onChange = _ref2.onChange;
   var defaultState = Object.keys(model).reduce(function (a, b) {
-    return a[b] = model[b].type === 'date' ? new Date().toISOString() : model[b].type === 'checkbox' ? [] : "", a;
+    var defaultValue = model[b].defaultValue;
+
+    if (model[b].type === 'date') {
+      a[b] = defaultValue ? defaultValue.toISOString() : new Date().toISOString();
+    } else if (model[b].type === 'select') {
+      a[b] = defaultValue ? model[b].options.find(function (option) {
+        return option.value === defaultValue;
+      }) : "";
+    } else if (model[b].type === 'checkbox') {
+      a[b] = defaultValue && defaultValue.length ? defaultValue : [];
+    } else {
+      a[b] = defaultValue || "";
+    }
+
+    return a;
   }, {});
   var defaultCurrency = Object.keys(model).reduce(function (a, b) {
+    var defaultValue = model[b].defaultValue;
+
     if (model[b].type === 'currency') {
-      a[b] = '';
+      a[b] = numberToCurrency(defaultValue) || "";
     }
 
     return a;
@@ -140,8 +156,7 @@ var index = (function (_ref2) {
       options = _React$useState3[0],
       setOptions = _React$useState3[1];
 
-  window.options = options;
-  console.log('options', options);
+  console.log('state', state);
   var prevState = usePrevious(state);
 
   var _React$useState4 = React.useState({
@@ -263,7 +278,8 @@ var index = (function (_ref2) {
         },
         dateFormat: model[key].format || "dd-MM-yyyy",
         customInput: React.createElement(CustomDatePicker, null),
-        disabled: model[key].disabled
+        disabled: model[key].disabled,
+        placeholderText: model[key].placeholder
       }))));
     } else if (model[key].type === 'select') {
       formItems.push(React.createElement(FormGroup, {
@@ -278,14 +294,12 @@ var index = (function (_ref2) {
         className: "d-flex flex-column"
       }, function () {
         var SelectComponent = model[key].createable ? CreatableSelect : Select;
-        console.log(model[key], model[key].createable);
         return options[key].length > 0 ? React.createElement(React.Fragment, null, React.createElement(SelectComponent, {
           name: key,
           id: key,
           searchable: true,
           isClearable: true,
           required: model[key].required,
-          defaultValue: model[key].options[0].value || '',
           value: state[key],
           options: options[key],
           onChange: function onChange(option) {
@@ -294,7 +308,8 @@ var index = (function (_ref2) {
           onCreateOption: function onCreateOption(inputValue) {
             return onCreateOptionSelect(key, inputValue, model[key].onCreateOption);
           },
-          isDisabled: model[key].disabled
+          isDisabled: model[key].disabled,
+          placeholder: model[key].placeholder
         }), React.createElement("input", {
           // this field hidden, for detect validation only
           tabIndex: -1,
@@ -380,7 +395,8 @@ var index = (function (_ref2) {
         name: key,
         id: key,
         required: model[key].required,
-        disabled: model[key].disabled
+        disabled: model[key].disabled,
+        placeholder: model[key].placeholder
       }))));
     } else if (model[key].type === 'submit') {
       formItems.push(React.createElement(Row, {
@@ -413,7 +429,8 @@ var index = (function (_ref2) {
         name: key,
         id: key,
         required: model[key].required,
-        disabled: model[key].disabled
+        disabled: model[key].disabled,
+        placeholder: model[key].placeholder
       }))));
     }
   });
