@@ -12,7 +12,7 @@ var React = _interopDefault(require("react")), reactstrap = require("reactstrap"
 
 require("react-datepicker/dist/react-datepicker.css");
 
-var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), Select = _interopDefault(require("react-select")), ModalSpinner = function(_ref) {
+var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), Select = _interopDefault(require("react-select")), CreatableSelect = _interopDefault(require("react-select/creatable")), ModalSpinner = function(_ref) {
   var _ref$isOpen = _ref.isOpen, isOpen = void 0 !== _ref$isOpen && _ref$isOpen, _ref$message = _ref.message, message = void 0 === _ref$message ? "" : _ref$message, _ref$type = _ref.type, type = void 0 === _ref$type ? "" : _ref$type, _ref$onAccept = _ref.onAccept, onAccept = void 0 === _ref$onAccept ? function() {
     return !1;
   } : _ref$onAccept, _ref$onDismiss = _ref.onDismiss, onDismiss = void 0 === _ref$onDismiss ? function() {
@@ -105,11 +105,15 @@ var index = function(_ref2) {
     a;
   }), {}), defaultCurrency = Object.keys(model).reduce((function(a, b) {
     return "currency" === model[b].type && (a[b] = ""), a;
-  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], prevState = usePrevious(state), _React$useState3 = React.useState({
+  }), {}), defaultOptions = Object.keys(model).reduce((function(a, b) {
+    return "select" === model[b].type && (a[b] = model[b].options), a;
+  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], _React$useState3 = React.useState(defaultOptions), options = _React$useState3[0], setOptions = _React$useState3[1];
+  window.options = options, console.log("options", options);
+  var prevState = usePrevious(state), _React$useState4 = React.useState({
     open: !1,
     type: "loading",
     message: ""
-  }), modal = _React$useState3[0], setModal = _React$useState3[1], formItems = [], onChangeState = function(e) {
+  }), modal = _React$useState4[0], setModal = _React$useState4[1], formItems = [], onChangeState = function(e) {
     var changedObject = {}, _e$currentTarget = e.currentTarget, value = _e$currentTarget.value;
     changedObject[_e$currentTarget.name] = value, setState(_extends({}, state, {}, changedObject));
   }, onChangeCurrency = function(e) {
@@ -118,6 +122,7 @@ var index = function(_ref2) {
     currencyObject[name] = numberToCurrency(value), setCurrency(_extends({}, currency, {}, currencyObject));
   };
   return Object.keys(model).forEach((function(key) {
+    var SelectComponent;
     "date" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
@@ -151,7 +156,8 @@ var index = function(_ref2) {
     }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
       sm: 8,
       className: "d-flex flex-column"
-    }, model[key].options.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Select, {
+    }, (SelectComponent = model[key].createable ? CreatableSelect : Select, console.log(model[key], model[key].createable), 
+    options[key].length > 0 ? React.createElement(React.Fragment, null, React.createElement(SelectComponent, {
       name: key,
       id: key,
       searchable: !0,
@@ -159,12 +165,18 @@ var index = function(_ref2) {
       required: model[key].required,
       defaultValue: model[key].options[0].value || "",
       value: state[key],
+      options: options[key],
       onChange: function(option) {
         return (changedObject = {})[key] = null === (selectedOption = option) ? "" : selectedOption, 
         void setState(_extends({}, state, {}, changedObject));
         var selectedOption, changedObject;
       },
-      options: model[key].options,
+      onCreateOption: function(inputValue) {
+        return function(name, label, onCreateOption) {
+          var newOptionObject = onCreateOption(label), optionsObject = {};
+          optionsObject[name] = [].concat(options[name], [ newOptionObject ]), setOptions(_extends({}, options, {}, optionsObject));
+        }(key, inputValue, model[key].onCreateOption);
+      },
       isDisabled: model[key].disabled
     }), React.createElement("input", {
       tabIndex: -1,
@@ -178,7 +190,7 @@ var index = function(_ref2) {
       onChange: function(e) {
         return e.preventDefault();
       }
-    })) : React.createElement(reactstrap.Spinner, null)))) : "checkbox" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+    })) : React.createElement(reactstrap.Spinner, null))))) : "checkbox" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"

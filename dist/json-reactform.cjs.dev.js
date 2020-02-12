@@ -11,6 +11,7 @@ require('react-datepicker/dist/react-datepicker.css');
 var PropTypes = _interopDefault(require('prop-types'));
 var md = require('react-icons/md');
 var Select = _interopDefault(require('react-select'));
+var CreatableSelect = _interopDefault(require('react-select/creatable'));
 
 var ModalSpinner = function ModalSpinner(_ref) {
   var _ref$isOpen = _ref.isOpen,
@@ -125,6 +126,13 @@ var index = (function (_ref2) {
 
     return a;
   }, {});
+  var defaultOptions = Object.keys(model).reduce(function (a, b) {
+    if (model[b].type === 'select') {
+      a[b] = model[b].options;
+    }
+
+    return a;
+  }, {});
 
   var _React$useState = React.useState(defaultState),
       state = _React$useState[0],
@@ -134,16 +142,22 @@ var index = (function (_ref2) {
       currency = _React$useState2[0],
       setCurrency = _React$useState2[1];
 
+  var _React$useState3 = React.useState(defaultOptions),
+      options = _React$useState3[0],
+      setOptions = _React$useState3[1];
+
+  window.options = options;
+  console.log('options', options);
   var prevState = usePrevious(state);
 
-  var _React$useState3 = React.useState({
+  var _React$useState4 = React.useState({
     open: false,
     type: 'loading',
     // success, error
     message: ''
   }),
-      modal = _React$useState3[0],
-      setModal = _React$useState3[1];
+      modal = _React$useState4[0],
+      setModal = _React$useState4[1];
 
   var clearRequest = function clearRequest() {
     cancelSource.cancel('component unmounted');
@@ -210,6 +224,13 @@ var index = (function (_ref2) {
 
     changedObject[name] = selectedOption === null ? '' : selectedOption;
     setState(_extends({}, state, {}, changedObject));
+  };
+
+  var onCreateOptionSelect = function onCreateOptionSelect(name, label, onCreateOption) {
+    var newOptionObject = onCreateOption(label);
+    var optionsObject = {};
+    optionsObject[name] = [].concat(options[name], [newOptionObject]);
+    setOptions(_extends({}, options, {}, optionsObject));
   }; // onchange checkbox
 
 
@@ -262,7 +283,9 @@ var index = (function (_ref2) {
         sm: 8,
         className: "d-flex flex-column"
       }, function () {
-        return model[key].options.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Select, {
+        var SelectComponent = model[key].createable ? CreatableSelect : Select;
+        console.log(model[key], model[key].createable);
+        return options[key].length > 0 ? React.createElement(React.Fragment, null, React.createElement(SelectComponent, {
           name: key,
           id: key,
           searchable: true,
@@ -270,10 +293,13 @@ var index = (function (_ref2) {
           required: model[key].required,
           defaultValue: model[key].options[0].value || '',
           value: state[key],
+          options: options[key],
           onChange: function onChange(option) {
             return onChangeStateSelect(key, option);
           },
-          options: model[key].options,
+          onCreateOption: function onCreateOption(inputValue) {
+            return onCreateOptionSelect(key, inputValue, model[key].onCreateOption);
+          },
           isDisabled: model[key].disabled
         }), React.createElement("input", {
           // this field hidden, for detect validation only

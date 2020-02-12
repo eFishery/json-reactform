@@ -14,6 +14,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalSpinner from './components/ModalSpinner';
 import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { numberToCurrency, currencyToNumber } from './libs/helper'
 
 const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name, disabled }, ref) => (
@@ -49,9 +50,18 @@ export default ({model,onSubmit,onChange}) => {
 		}
 		return a
 	}, {})
+	const defaultOptions = Object.keys(model).reduce((a, b) => {
+		if (model[b].type === 'select') {
+			a[b] = model[b].options
+		}
+		return a
+	}, {})
 
 	const [state, setState] = React.useState(defaultState)
 	const [currency, setCurrency] = React.useState(defaultCurrency)
+	const [options, setOptions] = React.useState(defaultOptions)
+	window.options = options
+	console.log('options', options)
 
 	const prevState = usePrevious(state);
 
@@ -126,6 +136,16 @@ export default ({model,onSubmit,onChange}) => {
 		})
 	}
 
+	const onCreateOptionSelect = (name, label, onCreateOption) => {
+		const newOptionObject = onCreateOption(label)
+		const optionsObject = {}
+		optionsObject[name] = [ ...options[name], newOptionObject ]
+		setOptions({
+			...options,
+			...optionsObject
+		})
+	}
+
 	// onchange checkbox
 	const onChangeStateCheckbox = (key, value) => {
 		const changedObject = {}
@@ -170,10 +190,12 @@ export default ({model,onSubmit,onChange}) => {
 					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
 					<Col sm={8} className="d-flex flex-column">
 						{(() => {
-							return model[key].options.length > 0 ?
+							const SelectComponent = model[key].createable ? CreatableSelect : Select;
+							console.log(model[key], model[key].createable)
+							return options[key].length > 0 ?
 								(
 									<>
-										<Select
+										<SelectComponent
 											name={key}
 											id={key}
 											searchable={true}
@@ -181,8 +203,9 @@ export default ({model,onSubmit,onChange}) => {
 											required={model[key].required}
 											defaultValue={model[key].options[0].value || ''}
 											value={state[key]}
+											options={options[key]}
 											onChange={option => onChangeStateSelect(key, option)}
-											options={model[key].options}
+											onCreateOption={(inputValue) => onCreateOptionSelect(key, inputValue, model[key].onCreateOption)}
 											isDisabled={model[key].disabled}
 										/>
 										<input // this field hidden, for detect validation only
@@ -295,7 +318,6 @@ export default ({model,onSubmit,onChange}) => {
 				</FormGroup>
 			)
 		}
-
 	})
 
 	React.useEffect(() => {
