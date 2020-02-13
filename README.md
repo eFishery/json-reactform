@@ -93,8 +93,7 @@ We use react-select for rendering input type select and its options. By default 
 - **type**: checkbox
 - **required**: true | false
 - **disabled**: true | false
-- **defaultValue**: array of string
-  > It must be an array consisting the exact same string that representing the option you want to be set as checked by default.
+- **defaultValue**: string
 - **options**: array
   > The options is array of object that consists at least `label` and `value`. Label will be displayed in options, while value is the one that will be returned later.
 
@@ -104,7 +103,6 @@ We use react-select for rendering input type select and its options. By default 
 - **required**: true | false
 - **disabled**: true | false
 - **defaultValue**: string
-  > It must be the exact same string that representing the option you want to be set as checked by default.
 - **options**: array
   > The options is array of object that consists at least `label` and `value`. Label will be displayed in options, while value is the one that will be returned later.
 

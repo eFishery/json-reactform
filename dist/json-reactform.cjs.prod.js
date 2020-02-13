@@ -108,7 +108,7 @@ var index = function(_ref2) {
     a;
   }), {}), defaultCurrency = Object.keys(model).reduce((function(a, b) {
     var defaultValue = model[b].defaultValue;
-    return ("currency" === model[b].type || "number" === model[b].type && model[b].delimiter) && (a[b] = numberToCurrency(defaultValue) || ""), 
+    return "currency" === model[b].type && (a[b] = numberToCurrency(defaultValue) || ""), 
     a;
   }), {}), defaultOptions = Object.keys(model).reduce((function(a, b) {
     return "select" === model[b].type && (a[b] = model[b].options), a;
@@ -247,25 +247,6 @@ var index = function(_ref2) {
         onChange: onChangeState
       });
     }))))) : "currency" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
-      key: key,
-      row: !0,
-      className: "mb-4"
-    }, React.createElement(reactstrap.Label, {
-      for: key,
-      sm: 4
-    }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
-      sm: 8,
-      className: "d-flex flex-column"
-    }, React.createElement(reactstrap.Input, {
-      type: "text",
-      onChange: onChangeCurrency,
-      value: currency[key],
-      name: key,
-      id: key,
-      required: model[key].required,
-      disabled: model[key].disabled,
-      placeholder: model[key].placeholder
-    })))) : "number" === model[key].type && model[key].delimiter ? formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"

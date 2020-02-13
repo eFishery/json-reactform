@@ -118,11 +118,11 @@ var index = (function (_ref2) {
     } else if (model[b].type === 'select') {
       a[b] = defaultValue ? model[b].options.find(function (option) {
         return option.value === defaultValue;
-      }) : '';
+      }) : "";
     } else if (model[b].type === 'checkbox') {
       a[b] = defaultValue && defaultValue.length ? defaultValue : [];
     } else {
-      a[b] = defaultValue || '';
+      a[b] = defaultValue || "";
     }
 
     return a;
@@ -130,8 +130,8 @@ var index = (function (_ref2) {
   var defaultCurrency = Object.keys(model).reduce(function (a, b) {
     var defaultValue = model[b].defaultValue;
 
-    if (model[b].type === 'currency' || model[b].type === 'number' && model[b].delimiter) {
-      a[b] = numberToCurrency(defaultValue) || '';
+    if (model[b].type === 'currency') {
+      a[b] = numberToCurrency(defaultValue) || "";
     }
 
     return a;
@@ -275,7 +275,7 @@ var index = (function (_ref2) {
         onChange: function onChange(value) {
           return onChangeStateDate(key, value);
         },
-        dateFormat: model[key].format || 'dd-MM-yyyy',
+        dateFormat: model[key].format || "dd-MM-yyyy",
         customInput: React.createElement(CustomDatePicker, null),
         disabled: model[key].disabled,
         placeholderText: model[key].placeholder
@@ -377,27 +377,6 @@ var index = (function (_ref2) {
         });
       }))));
     } else if (model[key].type === 'currency') {
-      formItems.push(React.createElement(FormGroup, {
-        key: key,
-        row: true,
-        className: "mb-4"
-      }, React.createElement(Label, {
-        "for": key,
-        sm: 4
-      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
-        sm: 8,
-        className: "d-flex flex-column"
-      }, React.createElement(Input, {
-        type: "text",
-        onChange: onChangeCurrency,
-        value: currency[key],
-        name: key,
-        id: key,
-        required: model[key].required,
-        disabled: model[key].disabled,
-        placeholder: model[key].placeholder
-      }))));
-    } else if (model[key].type === 'number' && model[key].delimiter) {
       formItems.push(React.createElement(FormGroup, {
         key: key,
         row: true,
