@@ -63,7 +63,10 @@ export default ({ model, onSubmit, onChange }) => {
 
   const defaultCurrency = Object.keys(model).reduce((a, b) => {
     const { defaultValue } = model[b];
-    if (model[b].type === 'currency') {
+    if (
+      model[b].type === 'currency' ||
+      (model[b].type === 'number' && model[b].delimiter)
+    ) {
       a[b] = numberToCurrency(defaultValue) || '';
     }
     return a;
@@ -321,6 +324,26 @@ export default ({ model, onSubmit, onChange }) => {
         </FormGroup>
       );
     } else if (model[key].type === 'currency') {
+      formItems.push(
+        <FormGroup key={key} row className="mb-4">
+          <Label for={key} sm={4}>
+            {key} {model[key].required ? '*' : null}
+          </Label>
+          <Col sm={8} className="d-flex flex-column">
+            <Input
+              type="text"
+              onChange={onChangeCurrency}
+              value={currency[key]}
+              name={key}
+              id={key}
+              required={model[key].required}
+              disabled={model[key].disabled}
+              placeholder={model[key].placeholder}
+            />
+          </Col>
+        </FormGroup>
+      );
+    } else if (model[key].type === 'number' && model[key].delimiter) {
       formItems.push(
         <FormGroup key={key} row className="mb-4">
           <Label for={key} sm={4}>
