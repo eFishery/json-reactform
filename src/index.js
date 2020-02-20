@@ -43,17 +43,19 @@ function usePrevious(value) {
 
 export default ({ model, onSubmit, onChange }) => {
   const defaultState = Object.keys(model).reduce((a, b) => {
-    const { defaultValue } = model[b];
-    if (model[b].type === 'date') {
+    const { defaultValue, type } = model[b];
+    if (type === 'date') {
       a[b] = defaultValue
         ? defaultValue.toISOString()
         : new Date().toISOString();
-    } else if (model[b].type === 'select') {
+    } else if (type === 'select') {
       a[b] = defaultValue
         ? model[b].options.find(option => option.value === defaultValue)
         : '';
-    } else if (model[b].type === 'checkbox') {
+    } else if (type === 'checkbox') {
       a[b] = defaultValue && defaultValue.length ? defaultValue : [];
+    } else if(type === 'submit') {
+      return a;
     } else {
       a[b] = defaultValue || '';
     }

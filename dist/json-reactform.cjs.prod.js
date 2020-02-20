@@ -55,11 +55,14 @@ function usePrevious(value) {
 
 var index = function(_ref2) {
   var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, defaultState = Object.keys(model).reduce((function(a, b) {
-    var defaultValue = model[b].defaultValue;
-    return "date" === model[b].type ? a[b] = defaultValue ? defaultValue.toISOString() : (new Date).toISOString() : "select" === model[b].type ? a[b] = defaultValue ? model[b].options.find((function(option) {
+    var _model$b = model[b], defaultValue = _model$b.defaultValue, type = _model$b.type;
+    if ("date" === type) a[b] = defaultValue ? defaultValue.toISOString() : (new Date).toISOString(); else if ("select" === type) a[b] = defaultValue ? model[b].options.find((function(option) {
       return option.value === defaultValue;
-    })) : "" : "checkbox" === model[b].type ? a[b] = defaultValue && defaultValue.length ? defaultValue : [] : a[b] = defaultValue || "", 
-    a;
+    })) : ""; else if ("checkbox" === type) a[b] = defaultValue && defaultValue.length ? defaultValue : []; else {
+      if ("submit" === type) return a;
+      a[b] = defaultValue || "";
+    }
+    return a;
   }), {}), defaultCurrency = Object.keys(model).reduce((function(a, b) {
     var defaultValue = model[b].defaultValue;
     return "currency" === model[b].type && (a[b] = numberToCurrency(defaultValue) || ""), 
