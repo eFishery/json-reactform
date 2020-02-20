@@ -1,6 +1,6 @@
 [![npm](https://img.shields.io/npm/v/json-reactform)](https://www.npmjs.com/package/json-reactform)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/json-reactform)
-![GitHub contributors](https://img.shields.io/github/contributors/efishery/json-reactform)
+![GitHub contributors](https://img.shields.io/github/contributors-anon/efishery/json-reactform)
 ![NPM](https://img.shields.io/npm/l/json-reactform)
 
 # JSON-ReactForm
