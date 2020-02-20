@@ -1,6 +1,6 @@
 {
   "name": "json-reactform",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "convert JSON schema into React component forms",
   "main": "dist/json-reactform.cjs.js",
   "module": "dist/json-reactform.esm.js",
