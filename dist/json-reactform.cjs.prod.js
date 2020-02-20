@@ -12,45 +12,7 @@ var React = _interopDefault(require("react")), reactstrap = require("reactstrap"
 
 require("react-datepicker/dist/react-datepicker.css");
 
-var PropTypes = _interopDefault(require("prop-types")), md = require("react-icons/md"), Select = _interopDefault(require("react-select")), CreatableSelect = _interopDefault(require("react-select/creatable")), ModalSpinner = function(_ref) {
-  var _ref$isOpen = _ref.isOpen, isOpen = void 0 !== _ref$isOpen && _ref$isOpen, _ref$message = _ref.message, message = void 0 === _ref$message ? "" : _ref$message, _ref$type = _ref.type, type = void 0 === _ref$type ? "" : _ref$type, _ref$onAccept = _ref.onAccept, onAccept = void 0 === _ref$onAccept ? function() {
-    return !1;
-  } : _ref$onAccept, _ref$onDismiss = _ref.onDismiss, onDismiss = void 0 === _ref$onDismiss ? function() {
-    return !1;
-  } : _ref$onDismiss, _ref$btnAcceptId = _ref.btnAcceptId, btnAcceptId = void 0 === _ref$btnAcceptId ? "" : _ref$btnAcceptId;
-  return React.createElement(reactstrap.Modal, {
-    isOpen: isOpen,
-    centered: !0,
-    returnFocusAfterClose: !1,
-    backdrop: "static"
-  }, React.createElement(reactstrap.ModalHeader, null, "Pop-Up Message"), React.createElement(reactstrap.ModalBody, {
-    className: "d-flex align-items-center font-weight-bold"
-  }, "loading" === type ? React.createElement(reactstrap.Spinner, {
-    color: "success",
-    className: "mr-2"
-  }) : null, "success" === type ? React.createElement(md.MdCheckCircle, {
-    className: "text-success",
-    size: 30
-  }) : null, "error" === type ? React.createElement(md.MdError, {
-    className: "text-danger",
-    size: 30
-  }) : null, "confirm" === type ? React.createElement(md.MdQuestionAnswer, {
-    className: "text-dark",
-    size: 30
-  }) : null, React.createElement("span", {
-    style: {
-      fontSize: "18px"
-    },
-    className: "ml-3"
-  }, message)), "loading" !== type ? React.createElement(reactstrap.ModalFooter, null, React.createElement(reactstrap.Button, {
-    color: "danger",
-    onClick: onDismiss
-  }, "confirm" === type ? "Cancel" : "Close"), "confirm" === type ? React.createElement(reactstrap.Button, {
-    color: "primary",
-    id: btnAcceptId,
-    onClick: onAccept
-  }, "Yes") : null) : null);
-};
+var Select = _interopDefault(require("react-select")), CreatableSelect = _interopDefault(require("react-select/creatable"));
 
 function numberToCurrency(n) {
   return ("string" != typeof n ? String(n) : n).replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -69,14 +31,6 @@ function _extends() {
     return target;
   }).apply(this, arguments);
 }
-
-ModalSpinner.propTypes = {
-  isOpen: PropTypes.bool,
-  message: PropTypes.string,
-  type: PropTypes.oneOf([ "loading", "success", "error", "confirm" ]),
-  onDismiss: PropTypes.func,
-  onAccept: PropTypes.func
-};
 
 var CustomDatePicker = React.forwardRef((function(_ref, ref) {
   var onChange = _ref.onChange, placeholder = _ref.placeholder, value = _ref.value, id = _ref.id, onClick = _ref.onClick, name = _ref.name, disabled = _ref.disabled;
@@ -112,14 +66,14 @@ var index = function(_ref2) {
     a;
   }), {}), defaultOptions = Object.keys(model).reduce((function(a, b) {
     return "select" === model[b].type && (a[b] = model[b].options), a;
-  }), {}), _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], _React$useState3 = React.useState(defaultOptions), options = _React$useState3[0], setOptions = _React$useState3[1], prevState = usePrevious(state), _React$useState4 = React.useState({
+  }), {}), formItems = [], _React$useState = React.useState(defaultState), state = _React$useState[0], setState = _React$useState[1], _React$useState2 = React.useState(defaultCurrency), currency = _React$useState2[0], setCurrency = _React$useState2[1], _React$useState3 = React.useState(defaultOptions), options = _React$useState3[0], setOptions = _React$useState3[1], prevState = usePrevious(state), _React$useState4 = React.useState({
     open: !1,
     type: "loading",
     message: ""
-  }), modal = _React$useState4[0], setModal = _React$useState4[1], formItems = [], onChangeState = function(e) {
+  }), onChangeState = (_React$useState4[0], _React$useState4[1], function(e) {
     var changedObject = {}, _e$currentTarget = e.currentTarget, value = _e$currentTarget.value;
     changedObject[_e$currentTarget.name] = value, setState(_extends({}, state, {}, changedObject));
-  }, onChangeCurrency = function(e) {
+  }), onChangeCurrency = function(e) {
     var changedObject = {}, currencyObject = {}, _e$currentTarget2 = e.currentTarget, value = _e$currentTarget2.value, name = _e$currentTarget2.name;
     changedObject[name] = currencyToNumber(value), setState(_extends({}, state, {}, changedObject)), 
     currencyObject[name] = numberToCurrency(value), setCurrency(_extends({}, currency, {}, currencyObject));
@@ -312,44 +266,9 @@ var index = function(_ref2) {
     }
   }), [ state ]), React.createElement(React.Fragment, null, React.createElement(reactstrap.Form, {
     onSubmit: function(e) {
-      e.preventDefault(), setModal((function(values) {
-        return _extends({}, values, {
-          type: "loading",
-          message: "Saving..",
-          open: !0
-        });
-      }));
-      var newState = Object.keys(state).reduce((function(a, b) {
-        return a[b] = "number" === model[b].type ? parseInt(state[b]) : state[b], a;
-      }), {});
-      onSubmit(newState).then((function() {
-        setState(defaultState), setModal((function(values) {
-          return _extends({}, values, {
-            type: "success",
-            message: "Success"
-          });
-        }));
-      })).catch((function(err) {
-        setModal((function(values) {
-          return _extends({}, values, {
-            type: "error",
-            message: "Failed to Save"
-          });
-        }));
-      }));
+      e.preventDefault(), onSubmit(state);
     }
-  }, formItems), React.createElement(ModalSpinner, {
-    isOpen: modal.open,
-    type: modal.type,
-    message: modal.message,
-    onDismiss: function() {
-      return setModal((function(values) {
-        return _extends({}, values, {
-          open: !1
-        });
-      }));
-    }
-  }));
+  }, formItems));
 };
 
 exports.default = index;

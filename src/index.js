@@ -10,9 +10,8 @@ import {
   CustomInput,
   Row,
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import ModalSpinner from './components/ModalSpinner';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { numberToCurrency, currencyToNumber } from './libs/helper';
@@ -76,6 +75,12 @@ export default ({ model, onSubmit, onChange }) => {
     return a;
   }, {});
 
+	const formItems = [];
+	const onFormSubmit = (e) => {
+		e.preventDefault();
+		onSubmit(state);
+	}
+
   const [state, setState] = React.useState(defaultState);
   const [currency, setCurrency] = React.useState(defaultCurrency);
   const [options, setOptions] = React.useState(defaultOptions);
@@ -90,39 +95,6 @@ export default ({ model, onSubmit, onChange }) => {
 
   const clearRequest = () => {
     cancelSource.cancel('component unmounted');
-  };
-
-  const formItems = [];
-
-  const onFormSubmit = e => {
-    e.preventDefault();
-    setModal(values => ({
-      ...values,
-      type: 'loading',
-      message: 'Saving..',
-      open: true,
-    }));
-    const newState = Object.keys(state).reduce((a, b) => {
-      return (
-        (a[b] = model[b].type === 'number' ? parseInt(state[b]) : state[b]), a
-      );
-    }, {});
-    onSubmit(newState)
-      .then(() => {
-        setState(defaultState);
-        setModal(values => ({
-          ...values,
-          type: 'success',
-          message: 'Success',
-        }));
-      })
-      .catch(err => {
-        setModal(values => ({
-          ...values,
-          type: 'error',
-          message: 'Failed to Save',
-        }));
-      });
   };
 
   const onChangeState = e => {
@@ -384,32 +356,29 @@ export default ({ model, onSubmit, onChange }) => {
     };
   }, []);
 
-  React.useEffect(() => {
-    if (onChange) {
-      const changedObject = [];
-      if (prevState && Object.keys(prevState).length > 0) {
-        Object.keys(prevState).forEach(key => {
-          if (prevState[key] !== state[key]) {
-            changedObject.push(key);
-          }
-        });
-        onChange({
-          value: state,
-          changed: changedObject,
-        });
-      }
-    }
-  }, [state]);
+	React.useEffect(()=>{
+		if(onChange) {
+			const changedObject = [];
+			if(prevState && Object.keys(prevState).length>0){
+				Object.keys(prevState).forEach((key) => {
+					if(prevState[key]!==state[key]){
+						changedObject.push(key);
+					}
+				})
+				onChange({
+					value: state,
+					changed: changedObject
+				});
+			}
+		}
+	}, [state])
 
-  return (
-    <>
-      <Form onSubmit={onFormSubmit}>{formItems}</Form>
-      <ModalSpinner
-        isOpen={modal.open}
-        type={modal.type}
-        message={modal.message}
-        onDismiss={() => setModal(values => ({ ...values, open: false }))}
-      />
-    </>
-  );
-};
+
+	return (
+		<>
+			<Form onSubmit={onFormSubmit}>
+				{formItems}
+			</Form>
+		</>
+	)
+}
