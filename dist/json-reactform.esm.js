@@ -1,8 +1,20 @@
 import React from 'react';
-import { FormGroup, Label, Col, Spinner, CustomInput, Row, Button, Input, Form } from 'reactstrap';
+import { FormGroup, Label, Col, Spinner, CustomInput, Input, Row, Button, Form } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
+
+function numberToCurrency(n) {
+  // format number 1000000 to 1,234,567
+  var str = typeof n !== 'string' ? String(n) : n;
+  return str.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+function currencyToNumber(n) {
+  // format number 1,234,567 to 1000000
+  var str = typeof n !== 'string' ? String(n) : n;
+  return str.replace(/[\,\.]/g, "");
+}
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 var CustomDatePicker = React.forwardRef(function (_ref, ref) {
@@ -11,7 +23,8 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
       value = _ref.value,
       id = _ref.id,
       onClick = _ref.onClick,
-      name = _ref.name;
+      name = _ref.name,
+      disabled = _ref.disabled;
   return React.createElement(Input, {
     ref: ref,
     onChange: onChange,
@@ -19,7 +32,8 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
     value: value,
     id: id,
     name: name,
-    onClick: onClick
+    onClick: onClick,
+    disabled: disabled
   });
 });
 
@@ -36,19 +50,70 @@ var index = (function (_ref2) {
       onSubmit = _ref2.onSubmit,
       onChange = _ref2.onChange;
   var defaultState = Object.keys(model).reduce(function (a, b) {
-    return a[b] = model[b].type === 'date' ? new Date().toISOString() : model[b].type === 'checkbox' ? [] : "", a;
+    var defaultValue = model[b].defaultValue;
+
+    if (model[b].type === 'date') {
+      a[b] = defaultValue ? defaultValue.toISOString() : new Date().toISOString();
+    } else if (model[b].type === 'select') {
+      a[b] = defaultValue ? model[b].options.find(function (option) {
+        return option.value === defaultValue;
+      }) : '';
+    } else if (model[b].type === 'checkbox') {
+      a[b] = defaultValue && defaultValue.length ? defaultValue : [];
+    } else {
+      a[b] = defaultValue || '';
+    }
+
+    return a;
   }, {});
+  var defaultCurrency = Object.keys(model).reduce(function (a, b) {
+    var defaultValue = model[b].defaultValue;
 
-  var _React$useState = React.useState(defaultState),
-      state = _React$useState[0],
-      setState = _React$useState[1];
+    if (model[b].type === 'currency') {
+      a[b] = numberToCurrency(defaultValue) || '';
+    }
 
-  var prevState = usePrevious(state);
+    return a;
+  }, {});
+  var defaultOptions = Object.keys(model).reduce(function (a, b) {
+    if (model[b].type === 'select') {
+      a[b] = model[b].options;
+    }
+
+    return a;
+  }, {});
   var formItems = [];
 
   var onFormSubmit = function onFormSubmit(e) {
     e.preventDefault();
     onSubmit(state);
+  };
+
+  var _React$useState = React.useState(defaultState),
+      state = _React$useState[0],
+      setState = _React$useState[1];
+
+  var _React$useState2 = React.useState(defaultCurrency),
+      currency = _React$useState2[0],
+      setCurrency = _React$useState2[1];
+
+  var _React$useState3 = React.useState(defaultOptions),
+      options = _React$useState3[0],
+      setOptions = _React$useState3[1];
+
+  var prevState = usePrevious(state);
+
+  var _React$useState4 = React.useState({
+    open: false,
+    type: 'loading',
+    // success, error
+    message: ''
+  }),
+      modal = _React$useState4[0],
+      setModal = _React$useState4[1];
+
+  var clearRequest = function clearRequest() {
+    cancelSource.cancel('component unmounted');
   };
 
   var onChangeState = function onChangeState(e) {
@@ -59,6 +124,19 @@ var index = (function (_ref2) {
 
     changedObject[name] = value;
     setState(_extends({}, state, {}, changedObject));
+  };
+
+  var onChangeCurrency = function onChangeCurrency(e) {
+    var changedObject = {};
+    var currencyObject = {};
+    var _e$currentTarget2 = e.currentTarget,
+        value = _e$currentTarget2.value,
+        name = _e$currentTarget2.name; // const value = e.currentTarget.value
+
+    changedObject[name] = currencyToNumber(value);
+    setState(_extends({}, state, {}, changedObject));
+    currencyObject[name] = numberToCurrency(value);
+    setCurrency(_extends({}, currency, {}, currencyObject));
   }; // khususon onchange si react-select
 
 
@@ -67,6 +145,13 @@ var index = (function (_ref2) {
 
     changedObject[name] = selectedOption === null ? '' : selectedOption;
     setState(_extends({}, state, {}, changedObject));
+  };
+
+  var onCreateOptionSelect = function onCreateOptionSelect(name, label, onCreateOption) {
+    var newOptionObject = onCreateOption(label);
+    var optionsObject = {};
+    optionsObject[name] = [].concat(options[name], [newOptionObject]);
+    setOptions(_extends({}, options, {}, optionsObject));
   }; // onchange checkbox
 
 
@@ -103,8 +188,10 @@ var index = (function (_ref2) {
         onChange: function onChange(value) {
           return onChangeStateDate(key, value);
         },
-        dateFormat: "dd/MM/yyyy",
-        customInput: React.createElement(CustomDatePicker, null)
+        dateFormat: model[key].format || 'dd-MM-yyyy',
+        customInput: React.createElement(CustomDatePicker, null),
+        disabled: model[key].disabled,
+        placeholderText: model[key].placeholder
       }))));
     } else if (model[key].type === 'select') {
       formItems.push(React.createElement(FormGroup, {
@@ -118,18 +205,23 @@ var index = (function (_ref2) {
         sm: 8,
         className: "d-flex flex-column"
       }, function () {
-        return model[key].options.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Select, {
+        var SelectComponent = model[key].createable ? CreatableSelect : Select;
+        return options[key].length > 0 ? React.createElement(React.Fragment, null, React.createElement(SelectComponent, {
           name: key,
           id: key,
           searchable: true,
           isClearable: true,
           required: model[key].required,
-          defaultValue: model[key].options[0].value || '',
           value: state[key],
+          options: options[key],
           onChange: function onChange(option) {
             return onChangeStateSelect(key, option);
           },
-          options: model[key].options
+          onCreateOption: function onCreateOption(inputValue) {
+            return onCreateOptionSelect(key, inputValue, model[key].onCreateOption);
+          },
+          isDisabled: model[key].disabled,
+          placeholder: model[key].placeholder
         }), React.createElement("input", {
           // this field hidden, for detect validation only
           tabIndex: -1,
@@ -166,6 +258,7 @@ var index = (function (_ref2) {
           value: item.value,
           checked: state[key].includes(item.value),
           required: index === 0 && state[key].length === 0 && model[key].required,
+          disabled: model[key].disabled,
           onChange: function onChange(e) {
             return onChangeStateCheckbox(key, e.target.value);
           }
@@ -182,7 +275,7 @@ var index = (function (_ref2) {
       }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
         sm: 8,
         className: "d-flex flex-column"
-      }, model[key].options.map(function (item) {
+      }, model[key].options.map(function (item, index) {
         return React.createElement(CustomInput, {
           type: "radio",
           label: item.label,
@@ -190,15 +283,36 @@ var index = (function (_ref2) {
           key: item.value,
           name: key,
           value: item.value,
-          checked: state[key] === item.value,
+          checked: state[key].includes(item.value),
           required: model[key].required,
+          disabled: model[key].disabled,
           onChange: onChangeState
         });
+      }))));
+    } else if (model[key].type === 'currency') {
+      formItems.push(React.createElement(FormGroup, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(Label, {
+        "for": key,
+        sm: 4
+      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, React.createElement(Input, {
+        type: "text",
+        onChange: onChangeCurrency,
+        value: currency[key],
+        name: key,
+        id: key,
+        required: model[key].required,
+        disabled: model[key].disabled,
+        placeholder: model[key].placeholder
       }))));
     } else if (model[key].type === 'submit') {
       formItems.push(React.createElement(Row, {
         key: key,
-        row: true,
         className: "mb-4"
       }, React.createElement(Col, {
         sm: 4
@@ -206,7 +320,8 @@ var index = (function (_ref2) {
         sm: 8
       }, React.createElement(Button, {
         type: model[key].type,
-        color: "success"
+        color: "success",
+        disabled: model[key].disabled
       }, key))));
     } else {
       formItems.push(React.createElement(FormGroup, {
@@ -225,10 +340,17 @@ var index = (function (_ref2) {
         value: state[key],
         name: key,
         id: key,
-        required: model[key].required
+        required: model[key].required,
+        disabled: model[key].disabled,
+        placeholder: model[key].placeholder
       }))));
     }
   });
+  React.useEffect(function () {
+    return function () {
+      clearRequest();
+    };
+  }, []);
   React.useEffect(function () {
     if (onChange) {
       var changedObject = [];

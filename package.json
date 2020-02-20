@@ -1,12 +1,13 @@
 {
   "name": "json-reactform",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "convert JSON schema into React component forms",
   "main": "dist/json-reactform.cjs.js",
   "module": "dist/json-reactform.esm.js",
   "scripts": {
     "build": "preconstruct build",
-    "release": "yarn build && yarn publish"
+    "release": "yarn build && yarn publish",
+    "format": "prettier --write ./**/*"
   },
   "babel": {
     "presets": [
@@ -47,6 +48,14 @@
   "devDependencies": {
     "@babel/preset-env": "^7.7.7",
     "@babel/preset-react": "^7.7.4",
-    "@preconstruct/cli": "^1.1.4"
+    "@preconstruct/cli": "^1.1.4",
+    "husky": "^4.2.2",
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
