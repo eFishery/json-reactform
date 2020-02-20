@@ -12,7 +12,6 @@ import {
 } from 'reactstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import ModalSpinner from './components/ModalSpinner';
 import Select from 'react-select';
 
 const CustomDatePicker = React.forwardRef(({ onChange, placeholder, value, id, onClick, name }, ref) => (
@@ -36,37 +35,19 @@ function usePrevious(value) {
 
 export default ({model,onSubmit,onChange}) => {
 	const defaultState = Object.keys(model).reduce((a, b) => {
-		return (a[b] = model[b].type === 'date' ? 
+		return (a[b] = model[b].type === 'date' ?
 			new Date().toISOString() : (model[b].type === 'checkbox' ? [] : "")
 			, a)
 	}, {})
 	const [state, setState] = React.useState(defaultState)
 	const prevState = usePrevious(state);
-	const [modal, setModal] = React.useState({
-		open: false,
-		type: 'loading', // success, error
-		message: ''
-	})
-	const clearRequest = () => {
-    cancelSource.cancel('component unmounted')
-	}
+
 	const formItems = [];
 	const onFormSubmit = (e) => {
 		e.preventDefault();
-		setModal(values => ({ ...values, type: 'loading', message: 'Saving..', open: true}));
-		const newState =  Object.keys(state).reduce((a, b) => {
-			return (a[b] = model[b].type === 'number' ? parseInt(state[b]) : state[b], a)
-		}, {});
-		onSubmit(newState).then(() => {
-			setState(defaultState);
-			setModal(values => ({ ...values, type: 'success', message: 'Success'}));
-		}).catch(err => {
-			console.log("GAGAL", err);
-			setModal(values => ({ ...values, type: 'error', message: 'Failed to Save'}));
-		})
+		onSubmit(state);
 	}
-	
-	
+
 	const onChangeState = (e) => {
 		const changedObject = {}
 		const {
@@ -80,7 +61,7 @@ export default ({model,onSubmit,onChange}) => {
 			...changedObject
 		})
 	}
-
+  
 	// khususon onchange si react-select
 	const onChangeStateSelect = (name, selectedOption) => {
 		const changedObject = {}
@@ -175,14 +156,14 @@ export default ({model,onSubmit,onChange}) => {
 					<Col sm={8} className="d-flex flex-column">
 					{
 						model[key].options.map((item, index) => {
-							return <CustomInput 
+							return <CustomInput
 								type="checkbox"
 								label={item.label}
 								id={item.value}
 								key={item.value}
 								name={key}
 								value={item.value}
-								checked={state[key].includes(item.value)} 
+								checked={state[key].includes(item.value)}
 								required={index === 0 && state[key].length === 0 && model[key].required}
 								onChange={(e) => onChangeStateCheckbox(key, e.target.value)} />
 						})
@@ -197,15 +178,15 @@ export default ({model,onSubmit,onChange}) => {
 					<Label for={key} sm={4}>{key} {model[key].required ? '*' : null}</Label>
 					<Col sm={8} className="d-flex flex-column">
 					{
-						model[key].options.map((item, index) => {
-							return <CustomInput 
+						model[key].options.map((item) => {
+							return <CustomInput
 								type="radio"
 								label={item.label}
 								id={item.value}
 								key={item.value}
 								name={key}
 								value={item.value}
-								checked={state[key].includes(item.value)} 
+								checked={state[key]===item.value}
 								required={model[key].required}
 								onChange={onChangeState} />
 						})
@@ -237,12 +218,6 @@ export default ({model,onSubmit,onChange}) => {
 
 	})
 
-	React.useEffect(() => {
-		return () => {
-			clearRequest();
-		};
-	}, [])
-
 	React.useEffect(()=>{
 		if(onChange) {
 			const changedObject = [];
@@ -260,17 +235,12 @@ export default ({model,onSubmit,onChange}) => {
 		}
 	}, [state])
 
-	
+
 	return (
 		<>
 			<Form onSubmit={onFormSubmit}>
 				{formItems}
 			</Form>
-			<ModalSpinner
-				isOpen={modal.open}
-				type={modal.type}
-				message={modal.message}
-				onDismiss={() => setModal(values => ({...values, open: false}))} />
 		</>
 	)
 }
