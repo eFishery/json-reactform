@@ -118,10 +118,6 @@ var index = (function (_ref2) {
       modal = _React$useState4[0],
       setModal = _React$useState4[1];
 
-  var clearRequest = function clearRequest() {
-    cancelSource.cancel('component unmounted');
-  };
-
   var onChangeState = function onChangeState(e) {
     var changedObject = {};
     var _e$currentTarget = e.currentTarget,
@@ -352,11 +348,6 @@ var index = (function (_ref2) {
       }))));
     }
   });
-  React.useEffect(function () {
-    return function () {
-      clearRequest();
-    };
-  }, []);
   React.useEffect(function () {
     if (onChange) {
       var changedObject = [];

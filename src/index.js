@@ -93,10 +93,6 @@ export default ({ model, onSubmit, onChange }) => {
     message: '',
   });
 
-  const clearRequest = () => {
-    cancelSource.cancel('component unmounted');
-  };
-
   const onChangeState = e => {
     const changedObject = {};
     const { value, name } = e.currentTarget;
@@ -349,12 +345,6 @@ export default ({ model, onSubmit, onChange }) => {
       );
     }
   });
-
-  React.useEffect(() => {
-    return () => {
-      clearRequest();
-    };
-  }, []);
 
 	React.useEffect(()=>{
 		if(onChange) {

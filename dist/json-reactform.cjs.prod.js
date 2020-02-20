@@ -251,10 +251,6 @@ var index = function(_ref2) {
       placeholder: model[key].placeholder
     }))));
   })), React.useEffect((function() {
-    return function() {
-      cancelSource.cancel("component unmounted");
-    };
-  }), []), React.useEffect((function() {
     if (onChange) {
       var changedObject = [];
       prevState && Object.keys(prevState).length > 0 && (Object.keys(prevState).forEach((function(key) {
