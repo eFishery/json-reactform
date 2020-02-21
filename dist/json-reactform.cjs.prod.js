@@ -56,7 +56,7 @@ function usePrevious(value) {
 var index = function(_ref2) {
   var model = _ref2.model, onSubmit = _ref2.onSubmit, onChange = _ref2.onChange, defaultState = Object.keys(model).reduce((function(a, b) {
     var _model$b = model[b], defaultValue = _model$b.defaultValue, type = _model$b.type;
-    if ("date" === type) a[b] = defaultValue ? defaultValue.toISOString() : (new Date).toISOString(); else if ("select" === type) a[b] = defaultValue ? model[b].options.find((function(option) {
+    if ("date" === type) a[b] = defaultValue ? defaultValue.toISOString() : ""; else if ("select" === type) a[b] = defaultValue ? model[b].options.find((function(option) {
       return option.value === defaultValue;
     })) : ""; else if ("checkbox" === type) a[b] = defaultValue && defaultValue.length ? defaultValue : []; else {
       if ("submit" === type) return a;
@@ -96,7 +96,7 @@ var index = function(_ref2) {
     }, React.createElement(DatePicker, {
       id: key,
       name: key,
-      selected: new Date(state[key]),
+      selected: state[key] ? new Date(state[key]) : "",
       onChange: function(value) {
         return function(key, value) {
           var changedObject = {};

@@ -47,7 +47,7 @@ export default ({ model, onSubmit, onChange }) => {
     if (type === 'date') {
       a[b] = defaultValue
         ? defaultValue.toISOString()
-        : new Date().toISOString();
+        : ""
     } else if (type === 'select') {
       a[b] = defaultValue
         ? model[b].options.find(option => option.value === defaultValue)
@@ -176,7 +176,7 @@ export default ({ model, onSubmit, onChange }) => {
             <DatePicker
               id={key}
               name={key}
-              selected={new Date(state[key])}
+              selected={state[key] ? new Date(state[key]) : ""}
               onChange={value => onChangeStateDate(key, value)}
               dateFormat={model[key].format || 'dd-MM-yyyy'}
               customInput={<CustomDatePicker />}

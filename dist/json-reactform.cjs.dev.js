@@ -61,7 +61,7 @@ var index = (function (_ref2) {
         type = _model$b.type;
 
     if (type === 'date') {
-      a[b] = defaultValue ? defaultValue.toISOString() : new Date().toISOString();
+      a[b] = defaultValue ? defaultValue.toISOString() : "";
     } else if (type === 'select') {
       a[b] = defaultValue ? model[b].options.find(function (option) {
         return option.value === defaultValue;
@@ -190,7 +190,7 @@ var index = (function (_ref2) {
       }, React.createElement(DatePicker, {
         id: key,
         name: key,
-        selected: new Date(state[key]),
+        selected: state[key] ? new Date(state[key]) : "",
         onChange: function onChange(value) {
           return onChangeStateDate(key, value);
         },
