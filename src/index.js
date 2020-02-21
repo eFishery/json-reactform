@@ -17,7 +17,7 @@ import CreatableSelect from 'react-select/creatable';
 import { numberToCurrency, currencyToNumber } from './libs/helper';
 
 const CustomDatePicker = React.forwardRef(
-  ({ onChange, placeholder, value, id, onClick, name, disabled }, ref) => {
+  ({ onChange, placeholder, value, id, onClick, name, disabled, required }, ref) => {
     return (
       <Input
         ref={ref}
@@ -28,6 +28,7 @@ const CustomDatePicker = React.forwardRef(
         name={name}
         onClick={onClick}
         disabled={disabled}
+        required={required}
       />
     );
   }
@@ -182,6 +183,7 @@ export default ({ model, onSubmit, onChange }) => {
               customInput={<CustomDatePicker />}
               disabled={model[key].disabled}
               placeholderText={model[key].placeholder}
+              required={model[key].required}
             />
           </Col>
         </FormGroup>

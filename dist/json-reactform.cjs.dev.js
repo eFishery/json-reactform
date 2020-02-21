@@ -30,7 +30,8 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
       id = _ref.id,
       onClick = _ref.onClick,
       name = _ref.name,
-      disabled = _ref.disabled;
+      disabled = _ref.disabled,
+      required = _ref.required;
   return React.createElement(reactstrap.Input, {
     ref: ref,
     onChange: onChange,
@@ -39,7 +40,8 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
     id: id,
     name: name,
     onClick: onClick,
-    disabled: disabled
+    disabled: disabled,
+    required: required
   });
 });
 
@@ -197,7 +199,8 @@ var index = (function (_ref2) {
         dateFormat: model[key].format || 'dd-MM-yyyy',
         customInput: React.createElement(CustomDatePicker, null),
         disabled: model[key].disabled,
-        placeholderText: model[key].placeholder
+        placeholderText: model[key].placeholder,
+        required: model[key].required
       }))));
     } else if (model[key].type === 'select') {
       formItems.push(React.createElement(reactstrap.FormGroup, {
