@@ -10,14 +10,17 @@ import {
   CustomInput,
   Row,
 } from 'reactstrap';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { numberToCurrency, currencyToNumber } from './libs/helper';
 
 const CustomDatePicker = React.forwardRef(
-  ({ onChange, placeholder, value, id, onClick, name, disabled, required }, ref) => {
+  (
+    { onChange, placeholder, value, id, onClick, name, disabled, required },
+    ref
+  ) => {
     return (
       <Input
         ref={ref}
@@ -46,16 +49,14 @@ export default ({ model, onSubmit, onChange }) => {
   const defaultState = Object.keys(model).reduce((a, b) => {
     const { defaultValue, type } = model[b];
     if (type === 'date') {
-      a[b] = defaultValue
-        ? defaultValue.toISOString()
-        : ""
+      a[b] = defaultValue ? defaultValue.toISOString() : '';
     } else if (type === 'select') {
       a[b] = defaultValue
         ? model[b].options.find(option => option.value === defaultValue)
         : '';
     } else if (type === 'checkbox') {
       a[b] = defaultValue && defaultValue.length ? defaultValue : [];
-    } else if(type === 'submit') {
+    } else if (type === 'submit') {
       return a;
     } else {
       a[b] = defaultValue || '';
@@ -78,11 +79,11 @@ export default ({ model, onSubmit, onChange }) => {
     return a;
   }, {});
 
-	const formItems = [];
-	const onFormSubmit = (e) => {
-		e.preventDefault();
-		onSubmit(state);
-	}
+  const formItems = [];
+  const onFormSubmit = e => {
+    e.preventDefault();
+    onSubmit(state);
+  };
 
   const [state, setState] = React.useState(defaultState);
   const [currency, setCurrency] = React.useState(defaultCurrency);
@@ -177,7 +178,7 @@ export default ({ model, onSubmit, onChange }) => {
             <DatePicker
               id={key}
               name={key}
-              selected={state[key] ? new Date(state[key]) : ""}
+              selected={state[key] ? new Date(state[key]) : ''}
               onChange={value => onChangeStateDate(key, value)}
               dateFormat={model[key].format || 'dd-MM-yyyy'}
               customInput={<CustomDatePicker />}
@@ -248,8 +249,8 @@ export default ({ model, onSubmit, onChange }) => {
                 <CustomInput
                   type="checkbox"
                   label={item.label}
-                  id={item.value}
-                  key={item.value}
+                  id={item.label}
+                  key={item.label}
                   name={key}
                   value={item.value}
                   checked={state[key].includes(item.value)}
@@ -278,8 +279,8 @@ export default ({ model, onSubmit, onChange }) => {
                 <CustomInput
                   type="radio"
                   label={item.label}
-                  id={item.value}
-                  key={item.value}
+                  id={item.label}
+                  key={item.label}
                   name={key}
                   value={item.value}
                   checked={state[key].includes(item.value)}
@@ -350,29 +351,26 @@ export default ({ model, onSubmit, onChange }) => {
     }
   });
 
-	React.useEffect(()=>{
-		if(onChange) {
-			const changedObject = [];
-			if(prevState && Object.keys(prevState).length>0){
-				Object.keys(prevState).forEach((key) => {
-					if(prevState[key]!==state[key]){
-						changedObject.push(key);
-					}
-				})
-				onChange({
-					value: state,
-					changed: changedObject
-				});
-			}
-		}
-	}, [state])
+  React.useEffect(() => {
+    if (onChange) {
+      const changedObject = [];
+      if (prevState && Object.keys(prevState).length > 0) {
+        Object.keys(prevState).forEach(key => {
+          if (prevState[key] !== state[key]) {
+            changedObject.push(key);
+          }
+        });
+        onChange({
+          value: state,
+          changed: changedObject,
+        });
+      }
+    }
+  }, [state]);
 
-
-	return (
-		<>
-			<Form onSubmit={onFormSubmit}>
-				{formItems}
-			</Form>
-		</>
-	)
-}
+  return (
+    <>
+      <Form onSubmit={onFormSubmit}>{formItems}</Form>
+    </>
+  );
+};

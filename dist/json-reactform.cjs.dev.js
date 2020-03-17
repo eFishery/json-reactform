@@ -63,7 +63,7 @@ var index = (function (_ref2) {
         type = _model$b.type;
 
     if (type === 'date') {
-      a[b] = defaultValue ? defaultValue.toISOString() : "";
+      a[b] = defaultValue ? defaultValue.toISOString() : '';
     } else if (type === 'select') {
       a[b] = defaultValue ? model[b].options.find(function (option) {
         return option.value === defaultValue;
@@ -192,7 +192,7 @@ var index = (function (_ref2) {
       }, React.createElement(DatePicker, {
         id: key,
         name: key,
-        selected: state[key] ? new Date(state[key]) : "",
+        selected: state[key] ? new Date(state[key]) : '',
         onChange: function onChange(value) {
           return onChangeStateDate(key, value);
         },
@@ -261,8 +261,8 @@ var index = (function (_ref2) {
         return React.createElement(reactstrap.CustomInput, {
           type: "checkbox",
           label: item.label,
-          id: item.value,
-          key: item.value,
+          id: item.label,
+          key: item.label,
           name: key,
           value: item.value,
           checked: state[key].includes(item.value),
@@ -288,8 +288,8 @@ var index = (function (_ref2) {
         return React.createElement(reactstrap.CustomInput, {
           type: "radio",
           label: item.label,
-          id: item.value,
-          key: item.value,
+          id: item.label,
+          key: item.label,
           name: key,
           value: item.value,
           checked: state[key].includes(item.value),
