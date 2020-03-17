@@ -166,8 +166,8 @@ var index = function(_ref2) {
       return React.createElement(reactstrap.CustomInput, {
         type: "checkbox",
         label: item.label,
-        id: item.value,
-        key: item.value,
+        id: item.label,
+        key: item.label,
         name: key,
         value: item.value,
         checked: state[key].includes(item.value),
@@ -196,8 +196,8 @@ var index = function(_ref2) {
       return React.createElement(reactstrap.CustomInput, {
         type: "radio",
         label: item.label,
-        id: item.value,
-        key: item.value,
+        id: item.label,
+        key: item.label,
         name: key,
         value: item.value,
         checked: state[key].includes(item.value),
