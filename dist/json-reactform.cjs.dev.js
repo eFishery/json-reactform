@@ -292,7 +292,7 @@ var index = (function (_ref2) {
           key: item.label,
           name: key,
           value: item.value,
-          checked: state[key].includes(item.value),
+          checked: state[key] === item.value,
           required: model[key].required,
           disabled: model[key].disabled,
           onChange: onChangeState
