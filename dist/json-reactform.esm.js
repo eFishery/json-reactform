@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FormGroup, Label, Col, Input, Alert, Spinner, CustomInput, Row, Button, Form } from 'reactstrap';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 function numberToCurrency(n) {
   // format number 1000000 to 1,234,567
@@ -50,6 +50,124 @@ var InputDefault = React.memo(function (_ref) {
 });
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+var InputSelect = React.memo(function (_ref) {
+  var keyValue = _ref.keyValue,
+      model = _ref.model,
+      options = _ref.options,
+      control = _ref.control,
+      rules = _ref.rules,
+      errors = _ref.errors;
+
+  var _useState = useState(options),
+      optionsFilter = _useState[0],
+      setOptionsFilter = _useState[1];
+
+  var onCreateOptionSelect = function onCreateOptionSelect(name, label, onCreateOption) {
+    var newOptionObject = onCreateOption(label);
+    var optionsObject = {};
+    optionsObject[name] = [].concat(optionsFilter[name], [newOptionObject]);
+    setOptionsFilter(_extends({}, optionsFilter, {}, optionsObject));
+  };
+
+  return React.createElement(FormGroup, {
+    key: keyValue,
+    row: true,
+    className: "mb-4"
+  }, React.createElement(Label, {
+    "for": keyValue,
+    sm: 4
+  }, keyValue, " ", model.required ? '*' : null), React.createElement(Col, {
+    sm: 8,
+    className: "d-flex flex-column"
+  }, function () {
+    var SelectComponent = model.createable ? CreatableSelect : Select;
+    return optionsFilter.length > 0 ? React.createElement(React.Fragment, null, React.createElement(Controller, {
+      name: keyValue,
+      control: control,
+      rules: rules,
+      onChange: function onChange(_ref2) {
+        var selected = _ref2[0];
+        return selected;
+      },
+      as: React.createElement(SelectComponent, {
+        searchable: true,
+        isClearable: true,
+        options: optionsFilter,
+        onCreateOption: function onCreateOption(inputValue) {
+          return onCreateOptionSelect(keyValue, inputValue, model.onCreateOption);
+        },
+        isDisabled: model.disabled,
+        placeholder: model.placeholder
+      })
+    })) : React.createElement(Spinner, null);
+  }(), errors[keyValue] && React.createElement(Alert, {
+    color: "danger"
+  }, errors[keyValue].message)));
+});
+
+var InputDate = React.memo(function (_ref) {
+  var value = _ref.value,
+      keyValue = _ref.keyValue,
+      rules = _ref.rules,
+      model = _ref.model,
+      control = _ref.control,
+      errors = _ref.errors;
+  var CustomDatePicker = React.forwardRef(function (_ref2, ref) {
+    var onChange = _ref2.onChange,
+        placeholder = _ref2.placeholder,
+        value = _ref2.value,
+        id = _ref2.id,
+        onClick = _ref2.onClick,
+        name = _ref2.name,
+        disabled = _ref2.disabled,
+        required = _ref2.required;
+    return React.createElement(Input, {
+      ref: ref,
+      onChange: onChange,
+      placeholder: placeholder,
+      value: value,
+      id: id,
+      name: name,
+      onClick: onClick,
+      disabled: disabled,
+      required: required
+    });
+  });
+  return React.createElement(FormGroup, {
+    key: keyValue,
+    row: true,
+    className: "mb-4"
+  }, React.createElement(Label, {
+    "for": keyValue,
+    sm: 4
+  }, keyValue, " ", rules.required ? '*' : null), React.createElement(Col, {
+    sm: 8,
+    className: "d-flex flex-column"
+  }, React.createElement(Controller, {
+    name: keyValue,
+    control: control,
+    rules: rules,
+    onChange: function onChange(_ref3) {
+      var selected = _ref3[0];
+      return selected;
+    },
+    as: React.createElement(DatePicker, {
+      selected: value ? new Date(value) : '',
+      dateFormat: model.format || 'dd-MM-yyyy',
+      showTimeSelect: false,
+      customInput: React.createElement(CustomDatePicker, null),
+      todayButton: "Today",
+      dropdownMode: "select",
+      isClearable: true,
+      shouldCloseOnSelect: true,
+      placeholderText: model.placeholder
+    })
+  }), errors[keyValue] && React.createElement(Alert, {
+    color: "danger"
+  }, errors[keyValue].message)));
+});
+
+function _extends$1() { _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$1.apply(this, arguments); }
 var CustomDatePicker = React.forwardRef(function (_ref, ref) {
   var onChange = _ref.onChange,
       placeholder = _ref.placeholder,
@@ -85,7 +203,24 @@ var index = (function (_ref2) {
       onSubmit = _ref2.onSubmit,
       onChange = _ref2.onChange;
 
-  var _useForm = useForm(),
+  var _useForm = useForm({
+    defaultValues: Object.getOwnPropertyNames(model).reduce(function (o, key) {
+      var _Object$assign;
+
+      if (model[key].type === 'currency') {
+        model[key].defaultValue = numberToCurrency(model[key].defaultValue);
+      }
+
+      if (model[key].type === 'select') {
+        model[key].defaultValue = model[key].options.find(function (option) {
+          return option.value === model[key].defaultValue;
+        });
+      }
+
+      return Object.assign(o, (_Object$assign = {}, _Object$assign[key] = model[key].defaultValue, _Object$assign));
+    }, {})
+  }),
+      control = _useForm.control,
       register = _useForm.register,
       errors = _useForm.errors,
       watch = _useForm.watch,
@@ -93,8 +228,8 @@ var index = (function (_ref2) {
       getValues = _useForm.getValues,
       handleSubmit = _useForm.handleSubmit;
 
-  var watchAll = watch();
-  console.log(watchAll);
+  var values = watch();
+  console.log(values);
   var defaultState = Object.keys(model).reduce(function (a, b) {
     var _model$b = model[b],
         defaultValue = _model$b.defaultValue,
@@ -164,23 +299,8 @@ var index = (function (_ref2) {
         name = _e$currentTarget.name; // const value = e.currentTarget.value
 
     changedObject[name] = value;
-    setState(_extends({}, state, {}, changedObject));
+    setState(_extends$1({}, state, {}, changedObject));
   };
-
-
-  var onChangeStateSelect = function onChangeStateSelect(name, selectedOption) {
-    var changedObject = {}; // const value = e.currentTarget.value
-
-    changedObject[name] = selectedOption === null ? '' : selectedOption;
-    setState(_extends({}, state, {}, changedObject));
-  };
-
-  var onCreateOptionSelect = function onCreateOptionSelect(name, label, onCreateOption) {
-    var newOptionObject = onCreateOption(label);
-    var optionsObject = {};
-    optionsObject[name] = [].concat(options[name], [newOptionObject]);
-    setOptions(_extends({}, options, {}, optionsObject));
-  }; // onchange checkbox
 
 
   var onChangeStateCheckbox = function onChangeStateCheckbox(key, value) {
@@ -188,84 +308,29 @@ var index = (function (_ref2) {
     changedObject[key] = state[key].includes(value) ? state[key].filter(function (item) {
       return item != value;
     }) : [].concat(state[key], [value]);
-    setState(_extends({}, state, {}, changedObject));
-  };
-
-  var onChangeStateDate = function onChangeStateDate(key, value) {
-    var changedObject = {};
-    changedObject[key] = value.toISOString();
-    setState(_extends({}, state, {}, changedObject));
+    setState(_extends$1({}, state, {}, changedObject));
   };
 
   Object.keys(model).forEach(function (key) {
     if (model[key].type === 'date') {
-      formItems.push(React.createElement(FormGroup, {
-        key: key,
-        row: true,
-        className: "mb-4"
-      }, React.createElement(Label, {
-        "for": key,
-        sm: 4
-      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
-        sm: 8,
-        className: "d-flex flex-column"
-      }, React.createElement(DatePicker, {
-        id: key,
-        name: key,
-        selected: state[key] ? new Date(state[key]) : '',
-        onChange: function onChange(value) {
-          return onChangeStateDate(key, value);
-        },
-        dateFormat: model[key].format || 'dd-MM-yyyy',
-        customInput: React.createElement(CustomDatePicker, null),
-        disabled: model[key].disabled,
-        placeholderText: model[key].placeholder,
-        required: model[key].required
-      }))));
+      formItems.push(React.createElement(InputDate, {
+        keyValue: key,
+        control: control,
+        rules: model[key].validation,
+        value: getValues(key),
+        model: model[key],
+        errors: errors
+      }));
     } else if (model[key].type === 'select') {
-      formItems.push(React.createElement(FormGroup, {
-        key: key,
-        row: true,
-        className: "mb-4"
-      }, React.createElement(Label, {
-        "for": key,
-        sm: 4
-      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
-        sm: 8,
-        className: "d-flex flex-column"
-      }, function () {
-        var SelectComponent = model[key].createable ? CreatableSelect : Select;
-        return options[key].length > 0 ? React.createElement(React.Fragment, null, React.createElement(SelectComponent, {
-          name: key,
-          id: key,
-          searchable: true,
-          isClearable: true,
-          required: model[key].required,
-          value: state[key],
-          options: options[key],
-          onChange: function onChange(option) {
-            return onChangeStateSelect(key, option);
-          },
-          onCreateOption: function onCreateOption(inputValue) {
-            return onCreateOptionSelect(key, inputValue, model[key].onCreateOption);
-          },
-          isDisabled: model[key].disabled,
-          placeholder: model[key].placeholder
-        }), React.createElement("input", {
-          // this field hidden, for detect validation only
-          tabIndex: -1,
-          autoComplete: "off",
-          style: {
-            opacity: 0,
-            height: 0
-          },
-          value: state[key],
-          required: model[key].required,
-          onChange: function onChange(e) {
-            return e.preventDefault();
-          }
-        })) : React.createElement(Spinner, null);
-      }())));
+      formItems.push(React.createElement(InputSelect, {
+        control: control,
+        rules: model[key].validation,
+        value: getValues(key),
+        keyValue: key,
+        model: model[key],
+        options: model[key].options,
+        errors: errors
+      }));
     } else if (model[key].type === 'checkbox') {
       formItems.push(React.createElement(FormGroup, {
         key: key,

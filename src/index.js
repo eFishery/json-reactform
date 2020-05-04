@@ -10,13 +10,13 @@ import {
   CustomInput,
   Row,
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { useForm } from 'react-hook-form';
 import { numberToCurrency, currencyToNumber } from './libs/helper';
 import InputDefault from './components/InputDefault';
+import InputSelect from './components/InputSelect';
+import InputDate from './components/InputDate';
 
 const CustomDatePicker = React.forwardRef(
   (
@@ -49,14 +49,28 @@ function usePrevious(value) {
 
 export default ({ model, onSubmit, onChange }) => {
   const {
+    control,
     register,
     errors,
     watch,
     setValue,
     getValues,
     handleSubmit,
-  } = useForm();
+  } = useForm({
+    defaultValues: Object.getOwnPropertyNames(model).reduce((o, key) => {
+      if (model[key].type === 'currency') {
+        model[key].defaultValue = numberToCurrency(model[key].defaultValue);
+      }
+      if (model[key].type === 'select') {
+        model[key].defaultValue = model[key].options.find(
+          option => option.value === model[key].defaultValue
+        );
+      }
+      return Object.assign(o, { [key]: model[key].defaultValue });
+    }, {}),
+  });
   const values = watch();
+  console.log(values);
   const defaultState = Object.keys(model).reduce((a, b) => {
     const { defaultValue, type } = model[b];
     if (type === 'date') {
@@ -132,27 +146,6 @@ export default ({ model, onSubmit, onChange }) => {
     });
   };
 
-  // khususon onchange si react-select
-  const onChangeStateSelect = (name, selectedOption) => {
-    const changedObject = {};
-    // const value = e.currentTarget.value
-    changedObject[name] = selectedOption === null ? '' : selectedOption;
-    setState({
-      ...state,
-      ...changedObject,
-    });
-  };
-
-  const onCreateOptionSelect = (name, label, onCreateOption) => {
-    const newOptionObject = onCreateOption(label);
-    const optionsObject = {};
-    optionsObject[name] = [...options[name], newOptionObject];
-    setOptions({
-      ...options,
-      ...optionsObject,
-    });
-  };
-
   // onchange checkbox
   const onChangeStateCheckbox = (key, value) => {
     const changedObject = {};
@@ -177,72 +170,26 @@ export default ({ model, onSubmit, onChange }) => {
   Object.keys(model).forEach(key => {
     if (model[key].type === 'date') {
       formItems.push(
-        <FormGroup key={key} row className="mb-4">
-          <Label for={key} sm={4}>
-            {key} {model[key].required ? '*' : null}
-          </Label>
-          <Col sm={8} className="d-flex flex-column">
-            <DatePicker
-              id={key}
-              name={key}
-              selected={state[key] ? new Date(state[key]) : ''}
-              onChange={value => onChangeStateDate(key, value)}
-              dateFormat={model[key].format || 'dd-MM-yyyy'}
-              customInput={<CustomDatePicker />}
-              disabled={model[key].disabled}
-              placeholderText={model[key].placeholder}
-              required={model[key].required}
-            />
-          </Col>
-        </FormGroup>
+        <InputDate
+          keyValue={key}
+          control={control}
+          rules={model[key].validation}
+          value={getValues(key)}
+          model={model[key]}
+          errors={errors}
+        />
       );
     } else if (model[key].type === 'select') {
       formItems.push(
-        <FormGroup key={key} row className="mb-4">
-          <Label for={key} sm={4}>
-            {key} {model[key].required ? '*' : null}
-          </Label>
-          <Col sm={8} className="d-flex flex-column">
-            {(() => {
-              const SelectComponent = model[key].createable
-                ? CreatableSelect
-                : Select;
-              return options[key].length > 0 ? (
-                <>
-                  <SelectComponent
-                    name={key}
-                    id={key}
-                    searchable={true}
-                    isClearable={true}
-                    required={model[key].required}
-                    value={state[key]}
-                    options={options[key]}
-                    onChange={option => onChangeStateSelect(key, option)}
-                    onCreateOption={inputValue =>
-                      onCreateOptionSelect(
-                        key,
-                        inputValue,
-                        model[key].onCreateOption
-                      )
-                    }
-                    isDisabled={model[key].disabled}
-                    placeholder={model[key].placeholder}
-                  />
-                  <input // this field hidden, for detect validation only
-                    tabIndex={-1}
-                    autoComplete="off"
-                    style={{ opacity: 0, height: 0 }}
-                    value={state[key]}
-                    required={model[key].required}
-                    onChange={e => e.preventDefault()}
-                  />
-                </>
-              ) : (
-                <Spinner />
-              );
-            })()}
-          </Col>
-        </FormGroup>
+        <InputSelect
+          control={control}
+          rules={model[key].validation}
+          value={getValues(key)}
+          keyValue={key}
+          model={model[key]}
+          options={model[key].options}
+          errors={errors}
+        />
       );
     } else if (model[key].type === 'checkbox') {
       formItems.push(
