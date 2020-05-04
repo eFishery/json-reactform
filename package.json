@@ -38,6 +38,8 @@
     "bootstrap": "^4.4.1",
     "prop-types": "^15.7.2",
     "react-datepicker": "^2.10.1",
+    "react-form-hook": "^0.0.1",
+    "react-hook-form": "^5.6.1",
     "react-icons": "^3.8.0",
     "react-select": "^3.0.8",
     "reactstrap": "^8.2.0"

@@ -10,17 +10,50 @@ var DatePicker = _interopDefault(require('react-datepicker'));
 require('react-datepicker/dist/react-datepicker.css');
 var Select = _interopDefault(require('react-select'));
 var CreatableSelect = _interopDefault(require('react-select/creatable'));
+var reactHookForm = require('react-hook-form');
 
 function numberToCurrency(n) {
   // format number 1000000 to 1,234,567
   var str = typeof n !== 'string' ? String(n) : n;
   return str.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-function currencyToNumber(n) {
-  // format number 1,234,567 to 1000000
-  var str = typeof n !== 'string' ? String(n) : n;
-  return str.replace(/[\,\.]/g, "");
-}
+
+var InputDefault = React.memo(function (_ref) {
+  var type = _ref.type,
+      value = _ref.value,
+      setValue = _ref.setValue,
+      keyValue = _ref.keyValue,
+      model = _ref.model,
+      register = _ref.register,
+      errors = _ref.errors;
+
+  if (type === 'currency') {
+    setValue(keyValue, numberToCurrency(value));
+  }
+
+  return React.createElement(reactstrap.FormGroup, {
+    key: keyValue,
+    row: true,
+    className: "mb-4"
+  }, React.createElement(reactstrap.Label, {
+    "for": keyValue,
+    sm: 4
+  }, keyValue, " ", model.required ? '*' : null), React.createElement(reactstrap.Col, {
+    sm: 8,
+    className: "d-flex flex-column"
+  }, React.createElement(reactstrap.Input, {
+    innerRef: register,
+    type: model.type,
+    name: keyValue,
+    id: keyValue,
+    disabled: model.disabled,
+    placeholder: model.placeholder
+  }), errors[keyValue] && React.createElement(reactstrap.Alert, {
+    color: "danger"
+  }, errors[keyValue].message)));
+}, function (prevProps, nextProps) {
+  return prevProps.value === nextProps.value && prevProps.errors[prevProps.keyValue] === nextProps.errors[nextProps.keyValue];
+});
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 var CustomDatePicker = React.forwardRef(function (_ref, ref) {
@@ -57,6 +90,17 @@ var index = (function (_ref2) {
   var model = _ref2.model,
       onSubmit = _ref2.onSubmit,
       onChange = _ref2.onChange;
+
+  var _useForm = reactHookForm.useForm(),
+      register = _useForm.register,
+      errors = _useForm.errors,
+      watch = _useForm.watch,
+      setValue = _useForm.setValue,
+      getValues = _useForm.getValues,
+      handleSubmit = _useForm.handleSubmit;
+
+  var watchAll = watch();
+  console.log(watchAll);
   var defaultState = Object.keys(model).reduce(function (a, b) {
     var _model$b = model[b],
         defaultValue = _model$b.defaultValue,
@@ -96,11 +140,6 @@ var index = (function (_ref2) {
   }, {});
   var formItems = [];
 
-  var onFormSubmit = function onFormSubmit(e) {
-    e.preventDefault();
-    onSubmit(state);
-  };
-
   var _React$useState = React.useState(defaultState),
       state = _React$useState[0],
       setState = _React$useState[1];
@@ -133,19 +172,6 @@ var index = (function (_ref2) {
     changedObject[name] = value;
     setState(_extends({}, state, {}, changedObject));
   };
-
-  var onChangeCurrency = function onChangeCurrency(e) {
-    var changedObject = {};
-    var currencyObject = {};
-    var _e$currentTarget2 = e.currentTarget,
-        value = _e$currentTarget2.value,
-        name = _e$currentTarget2.name; // const value = e.currentTarget.value
-
-    changedObject[name] = currencyToNumber(value);
-    setState(_extends({}, state, {}, changedObject));
-    currencyObject[name] = numberToCurrency(value);
-    setCurrency(_extends({}, currency, {}, currencyObject));
-  }; // khususon onchange si react-select
 
 
   var onChangeStateSelect = function onChangeStateSelect(name, selectedOption) {
@@ -298,27 +324,6 @@ var index = (function (_ref2) {
           onChange: onChangeState
         });
       }))));
-    } else if (model[key].type === 'currency') {
-      formItems.push(React.createElement(reactstrap.FormGroup, {
-        key: key,
-        row: true,
-        className: "mb-4"
-      }, React.createElement(reactstrap.Label, {
-        "for": key,
-        sm: 4
-      }, key, " ", model[key].required ? '*' : null), React.createElement(reactstrap.Col, {
-        sm: 8,
-        className: "d-flex flex-column"
-      }, React.createElement(reactstrap.Input, {
-        type: "text",
-        onChange: onChangeCurrency,
-        value: currency[key],
-        name: key,
-        id: key,
-        required: model[key].required,
-        disabled: model[key].disabled,
-        placeholder: model[key].placeholder
-      }))));
     } else if (model[key].type === 'submit') {
       formItems.push(React.createElement(reactstrap.Row, {
         key: key,
@@ -333,26 +338,15 @@ var index = (function (_ref2) {
         disabled: model[key].disabled
       }, key))));
     } else {
-      formItems.push(React.createElement(reactstrap.FormGroup, {
-        key: key,
-        row: true,
-        className: "mb-4"
-      }, React.createElement(reactstrap.Label, {
-        "for": key,
-        sm: 4
-      }, key, " ", model[key].required ? '*' : null), React.createElement(reactstrap.Col, {
-        sm: 8,
-        className: "d-flex flex-column"
-      }, React.createElement(reactstrap.Input, {
+      formItems.push(React.createElement("div", null, React.createElement(InputDefault, {
+        value: getValues(key),
+        setValue: setValue,
         type: model[key].type,
-        onChange: onChangeState,
-        value: state[key],
-        name: key,
-        id: key,
-        required: model[key].required,
-        disabled: model[key].disabled,
-        placeholder: model[key].placeholder
-      }))));
+        keyValue: key,
+        model: model[key],
+        register: register(model[key].validation),
+        errors: errors
+      })));
     }
   });
   React.useEffect(function () {
@@ -373,7 +367,7 @@ var index = (function (_ref2) {
     }
   }, [state]);
   return React.createElement(React.Fragment, null, React.createElement(reactstrap.Form, {
-    onSubmit: onFormSubmit
+    onSubmit: handleSubmit(onSubmit)
   }, formItems));
 });
 

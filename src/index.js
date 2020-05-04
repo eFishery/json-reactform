@@ -14,7 +14,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import { useForm } from 'react-hook-form';
 import { numberToCurrency, currencyToNumber } from './libs/helper';
+import InputDefault from './components/InputDefault';
 
 const CustomDatePicker = React.forwardRef(
   (
@@ -46,6 +48,15 @@ function usePrevious(value) {
 }
 
 export default ({ model, onSubmit, onChange }) => {
+  const {
+    register,
+    errors,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+  } = useForm();
+  const values = watch();
   const defaultState = Object.keys(model).reduce((a, b) => {
     const { defaultValue, type } = model[b];
     if (type === 'date') {
@@ -80,10 +91,6 @@ export default ({ model, onSubmit, onChange }) => {
   }, {});
 
   const formItems = [];
-  const onFormSubmit = e => {
-    e.preventDefault();
-    onSubmit(state);
-  };
 
   const [state, setState] = React.useState(defaultState);
   const [currency, setCurrency] = React.useState(defaultCurrency);
@@ -293,26 +300,6 @@ export default ({ model, onSubmit, onChange }) => {
           </Col>
         </FormGroup>
       );
-    } else if (model[key].type === 'currency') {
-      formItems.push(
-        <FormGroup key={key} row className="mb-4">
-          <Label for={key} sm={4}>
-            {key} {model[key].required ? '*' : null}
-          </Label>
-          <Col sm={8} className="d-flex flex-column">
-            <Input
-              type="text"
-              onChange={onChangeCurrency}
-              value={currency[key]}
-              name={key}
-              id={key}
-              required={model[key].required}
-              disabled={model[key].disabled}
-              placeholder={model[key].placeholder}
-            />
-          </Col>
-        </FormGroup>
-      );
     } else if (model[key].type === 'submit') {
       formItems.push(
         <Row key={key} className="mb-4">
@@ -330,23 +317,17 @@ export default ({ model, onSubmit, onChange }) => {
       );
     } else {
       formItems.push(
-        <FormGroup key={key} row className="mb-4">
-          <Label for={key} sm={4}>
-            {key} {model[key].required ? '*' : null}
-          </Label>
-          <Col sm={8} className="d-flex flex-column">
-            <Input
-              type={model[key].type}
-              onChange={onChangeState}
-              value={state[key]}
-              name={key}
-              id={key}
-              required={model[key].required}
-              disabled={model[key].disabled}
-              placeholder={model[key].placeholder}
-            />
-          </Col>
-        </FormGroup>
+        <div>
+          <InputDefault
+            value={getValues(key)}
+            setValue={setValue}
+            type={model[key].type}
+            keyValue={key}
+            model={model[key]}
+            register={register(model[key].validation)}
+            errors={errors}
+          />
+        </div>
       );
     }
   });
@@ -370,7 +351,7 @@ export default ({ model, onSubmit, onChange }) => {
 
   return (
     <>
-      <Form onSubmit={onFormSubmit}>{formItems}</Form>
+      <Form onSubmit={handleSubmit(onSubmit)}>{formItems}</Form>
     </>
   );
 };
