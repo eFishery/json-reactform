@@ -32,6 +32,7 @@ const CustomDatePicker = React.forwardRef(
         onClick={onClick}
         disabled={disabled}
         required={required}
+        autoComplete="off"
       />
     );
   }
@@ -309,6 +310,7 @@ export default ({ model, onSubmit, onChange }) => {
               required={model[key].required}
               disabled={model[key].disabled}
               placeholder={model[key].placeholder}
+              autoComplete="off"
             />
           </Col>
         </FormGroup>
@@ -344,6 +346,7 @@ export default ({ model, onSubmit, onChange }) => {
               required={model[key].required}
               disabled={model[key].disabled}
               placeholder={model[key].placeholder}
+              autoComplete={model[key].autoComplete ? '' : 'off'}
             />
           </Col>
         </FormGroup>
