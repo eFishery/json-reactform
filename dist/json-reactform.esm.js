@@ -35,7 +35,8 @@ var CustomDatePicker = React.forwardRef(function (_ref, ref) {
     name: name,
     onClick: onClick,
     disabled: disabled,
-    required: required
+    required: required,
+    autoComplete: "off"
   });
 });
 
@@ -311,7 +312,8 @@ var index = (function (_ref2) {
         id: key,
         required: model[key].required,
         disabled: model[key].disabled,
-        placeholder: model[key].placeholder
+        placeholder: model[key].placeholder,
+        autoComplete: "off"
       }))));
     } else if (model[key].type === 'submit') {
       formItems.push(React.createElement(Row, {
@@ -345,7 +347,8 @@ var index = (function (_ref2) {
         id: key,
         required: model[key].required,
         disabled: model[key].disabled,
-        placeholder: model[key].placeholder
+        placeholder: model[key].placeholder,
+        autoComplete: model[key].autoComplete ? '' : 'off'
       }))));
     }
   });
