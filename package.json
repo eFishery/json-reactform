@@ -6,6 +6,9 @@
   "module": "dist/json-reactform.esm.js",
   "scripts": {
     "build": "preconstruct build",
+    "preversion": "git stash; git checkout master; git pull origin master",
+    "postversion": "yarn release",
+    "postpublish": "git push origin --all; git push origin --tags",
     "release": "yarn build && yarn publish",
     "format": "prettier --write ./**/*"
   },
