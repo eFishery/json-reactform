@@ -172,6 +172,14 @@ var index = (function (_ref2) {
     setState(_extends({}, state, {}, changedObject));
   };
 
+  var onChangeFile = function onChangeFile(key, _ref3, model) {
+    var files = _ref3.target.files;
+    var changedObject = {};
+    var selectedFiles = !model.multiple ? files[0] : files;
+    changedObject[key] = selectedFiles;
+    setState(_extends({}, state, {}, changedObject));
+  };
+
   Object.keys(model).forEach(function (key) {
     if (model[key].type === 'date') {
       formItems.push(React.createElement(FormGroup, {
@@ -314,6 +322,37 @@ var index = (function (_ref2) {
         disabled: model[key].disabled,
         placeholder: model[key].placeholder,
         autoComplete: "off"
+      }))));
+    } else if (model[key].type === 'file') {
+      var label = !model[key].multiple && state[key] ? state[key].name : model[key].label;
+
+      if (model[key].multiple && state[key]) {
+        label = Array.from(state[key]).map(function (file) {
+          return file.name;
+        }).join(', ');
+      }
+
+      formItems.push(React.createElement(FormGroup, {
+        key: key,
+        row: true,
+        className: "mb-4"
+      }, React.createElement(Label, {
+        "for": key,
+        sm: 4
+      }, key, " ", model[key].required ? '*' : null), React.createElement(Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, React.createElement(CustomInput, {
+        type: "file",
+        id: key,
+        name: key,
+        label: label,
+        onChange: function onChange(e) {
+          return onChangeFile(key, e, model[key]);
+        },
+        required: model[key].required,
+        multiple: model[key].multiple,
+        accept: model[key].accept
       }))));
     } else if (model[key].type === 'submit') {
       formItems.push(React.createElement(Row, {

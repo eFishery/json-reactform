@@ -168,6 +168,16 @@ export default ({ model, onSubmit, onChange }) => {
     });
   };
 
+  const onChangeFile = (key, { target: { files } }, model) => {
+    const changedObject = {};
+    const selectedFiles = !model.multiple ? files[0] : files;
+    changedObject[key] = selectedFiles;
+    setState({
+      ...state,
+      ...changedObject,
+    });
+  };
+
   Object.keys(model).forEach(key => {
     if (model[key].type === 'date') {
       formItems.push(
@@ -311,6 +321,34 @@ export default ({ model, onSubmit, onChange }) => {
               disabled={model[key].disabled}
               placeholder={model[key].placeholder}
               autoComplete="off"
+            />
+          </Col>
+        </FormGroup>
+      );
+    } else if (model[key].type === 'file') {
+      let label =
+        !model[key].multiple && state[key] ? state[key].name : model[key].label;
+      if (model[key].multiple && state[key]) {
+        label = Array.from(state[key])
+          .map(file => file.name)
+          .join(', ');
+      }
+      formItems.push(
+        <FormGroup key={key} row className="mb-4">
+          <Label for={key} sm={4}>
+            {key} {model[key].required ? '*' : null}
+          </Label>
+          <Col sm={8} className="d-flex flex-column">
+            <CustomInput
+              type="file"
+              id={key}
+              name={key}
+              label={label}
+              onChange={e => onChangeFile(key, e, model[key])}
+              required={model[key].required}
+              multiple={model[key].multiple}
+              accept={model[key].accept}
+              disabled={model[key].disabled}
             />
           </Col>
         </FormGroup>
