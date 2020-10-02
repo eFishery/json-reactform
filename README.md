@@ -17,6 +17,7 @@ JSON React Form is library that convert JSON schema into React component forms.
 - checkbox
 - radio
 - currency
+- file
 - submit button
 
 ## How To Use
