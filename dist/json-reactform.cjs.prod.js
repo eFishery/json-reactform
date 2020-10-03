@@ -84,8 +84,7 @@ var index = function(_ref2) {
     currencyObject[name] = numberToCurrency(value), setCurrency(_extends({}, currency, {}, currencyObject));
   };
   return Object.keys(model).forEach((function(key) {
-    var SelectComponent;
-    "date" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+    if ("date" === model[key].type) formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"
@@ -110,7 +109,7 @@ var index = function(_ref2) {
       disabled: model[key].disabled,
       placeholderText: model[key].placeholder,
       required: model[key].required
-    })))) : "select" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+    })))); else if ("select" === model[key].type) formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"
@@ -153,7 +152,7 @@ var index = function(_ref2) {
       onChange: function(e) {
         return e.preventDefault();
       }
-    })) : React.createElement(reactstrap.Spinner, null))))) : "checkbox" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+    })) : React.createElement(reactstrap.Spinner, null))))); else if ("checkbox" === model[key].type) formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"
@@ -183,7 +182,7 @@ var index = function(_ref2) {
           }(key, e.target.value);
         }
       });
-    }))))) : "radio" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+    }))))); else if ("radio" === model[key].type) formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"
@@ -206,7 +205,7 @@ var index = function(_ref2) {
         disabled: model[key].disabled,
         onChange: onChangeState
       });
-    }))))) : "currency" === model[key].type ? formItems.push(React.createElement(reactstrap.FormGroup, {
+    }))))); else if ("currency" === model[key].type) formItems.push(React.createElement(reactstrap.FormGroup, {
       key: key,
       row: !0,
       className: "mb-4"
@@ -226,7 +225,36 @@ var index = function(_ref2) {
       disabled: model[key].disabled,
       placeholder: model[key].placeholder,
       autoComplete: "off"
-    })))) : "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
+    })))); else if ("file" === model[key].type) {
+      var label = !model[key].multiple && state[key] ? state[key].name : model[key].label;
+      model[key].multiple && state[key] && (label = Array.from(state[key]).map((function(file) {
+        return file.name;
+      })).join(", ")), formItems.push(React.createElement(reactstrap.FormGroup, {
+        key: key,
+        row: !0,
+        className: "mb-4"
+      }, React.createElement(reactstrap.Label, {
+        for: key,
+        sm: 4
+      }, key, " ", model[key].required ? "*" : null), React.createElement(reactstrap.Col, {
+        sm: 8,
+        className: "d-flex flex-column"
+      }, React.createElement(reactstrap.CustomInput, {
+        type: "file",
+        id: key,
+        name: key,
+        label: label,
+        onChange: function(e) {
+          return function(key, _ref3, model) {
+            var files = _ref3.target.files, changedObject = {}, selectedFiles = model.multiple ? files : files[0];
+            changedObject[key] = selectedFiles, setState(_extends({}, state, {}, changedObject));
+          }(key, e, model[key]);
+        },
+        required: model[key].required,
+        multiple: model[key].multiple,
+        accept: model[key].accept
+      }))));
+    } else "submit" === model[key].type ? formItems.push(React.createElement(reactstrap.Row, {
       key: key,
       className: "mb-4"
     }, React.createElement(reactstrap.Col, {
@@ -258,6 +286,7 @@ var index = function(_ref2) {
       placeholder: model[key].placeholder,
       autoComplete: model[key].autoComplete ? "" : "off"
     }))));
+    var SelectComponent;
   })), React.useEffect((function() {
     if (onChange) {
       var changedObject = [];

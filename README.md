@@ -17,6 +17,7 @@ JSON React Form is library that convert JSON schema into React component forms.
 - checkbox
 - radio
 - currency
+- file
 - submit button
 
 ## How To Use
@@ -108,6 +109,18 @@ We use react-select for rendering input type select and its options. By default 
 - **options**: array
   > The options is array of object that consists at least `label` and `value`. Label will be displayed in options, while value is the one that will be returned later.
 
+### File --> `return FileList`
+
+- **type**: file
+- **required**: true | false
+- **disabled**: true | false
+- **multiple**: true | false
+- **accept**: string
+  > Specifies supported formats for the file upload field.
+  > example: `.png, .jpg`.
+- **label**: string
+  > Label of the file upload field. It will be replaced when a file selected.
+
 ### Submit
 
 The key you provided to the model will become text inside this submit button.
@@ -169,6 +182,13 @@ export default {
         "label": "Not Completed"
       }
     ],
+  },
+  "Upload": {
+    "type": "file",
+    "required": true,
+    "multiple": true,
+    "accept": ".png,.jpg",
+    "label": "Choose an image file"
   },
   "Save": { // button submit
     "type": "submit",
